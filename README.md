@@ -68,4 +68,4 @@
 
 ## 画面遷移図
 
-https://www.figma.com/board/jgqi4ETQw4dOLl1JuJnck2/Nomu-Sup?node-id=0-1&p=f&t=XH75YybKbkBBjj3x-0
+https://www.figma.com/board/jgqi4ETQw4dOLl1JuJnck2/Nomu-Sup?node-id=0-1&t=XH75YybKbkBBjj3x-1
