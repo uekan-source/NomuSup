@@ -72,4 +72,4 @@ https://www.figma.com/board/jgqi4ETQw4dOLl1JuJnck2/Nomu-Sup?node-id=0-1&t=XH75Yy
 
 ## ER図
 
-https://gyazo.com/0fd54a225d54bcfc952937b0a6d5e91d
+https://gyazo.com/4e9d03afc4ff822c86c6f4db62027271
