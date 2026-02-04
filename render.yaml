@@ -1,0 +1,17 @@
+services:
+  # データベースの設定
+  - type: db
+    name: nomusup-db
+    ipAllowList: [] # セキュリティのためRender内部からのみ許可
+
+  # バックエンド(Rails)の設定
+  - type: web
+    name: nomusup-api
+    runtime: docker
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: nomusup-db
+          attribute: connectionString
+      - key: RAILS_MASTER_KEY
+        sync: false # 手動でRenderの管理画面から設定
