@@ -22,4 +22,4 @@ COPY . /app
 RUN chmod +x /app/bin/*
 
 # サーバー起動設定
-CMD ["bundle", "exec", "rails", "s", "-p", "3000", "-b", "0.0.0.0"]
+CMD bundle exec rails db:migrate && bundle exec rails db:seed && bundle exec rails s -p 3000 -b 0.0.0.0
