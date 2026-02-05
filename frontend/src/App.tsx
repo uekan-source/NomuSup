@@ -1,34 +1,39 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useEffect, useState } from 'react' // useEffectを追加
+import axios from 'axios'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  // 1. Railsから受け取ったメッセージを保存するための「箱（ステート）」
+  const [message, setMessage] = useState<string>("読み込み中...")
+
+  // 2. 画面が表示された時に実行する処理
+  useEffect(() => {
+    // ここにURLを定義します
+    const url = "https://nomusup-api.onrender.com/api/v1/health_check"
+
+    axios.get(url)
+      .then((res) => {
+        // 成功したらメッセージを書き換える
+        setMessage(res.data.message)
+      })
+      .catch((err) => {
+        console.error(err)
+        setMessage("APIとの通信に失敗しました")
+      })
+  }, []) // 第2引数を空にすることで、最初の1回だけ実行されます
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
+    <div className="App">
+      <h1>Nomu-Sup</h1>
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+        <p>Railsからの応答:</p>
+        {/* 3. 保存したメッセージを表示する */}
+        <h2 style={{ color: '#646cff' }}>{message}</h2>
       </div>
       <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
+        バックエンド（Render）とフロントエンド（Vercel）が繋がりました！
       </p>
-    </>
+    </div>
   )
 }
 
