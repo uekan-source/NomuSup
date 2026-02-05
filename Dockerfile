@@ -6,9 +6,14 @@ RUN apt-get update -qq && apt-get install -y build-essential libpq-dev nodejs po
 
 WORKDIR /app
 
+# 環境変数の設定 (本番モード)
+ENV RAILS_ENV="production" \
+    RAILS_SERVE_STATIC_FILES="true" \
+    RAILS_LOG_TO_STDOUT="true"
+
 # 先にGemfileだけコピーしてインストール（ビルド高速化のコツです）
 COPY Gemfile Gemfile.lock /app/
-RUN bundle install
+RUN bundle config set --local without 'development test' && bundle install
 
 # その後に残りのファイルをコピー
 COPY . /app
