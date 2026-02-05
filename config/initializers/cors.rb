@@ -8,7 +8,7 @@
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
     # VercelのURL、または開発用のlocalhostからのアクセスを許可
-    origins "localhost:5173", "https://your-vercel-project-name.vercel.app"
+    origins "localhost:5173", "https://nomu-sup-frontend.vercel.app"
 
     resource "*",
       headers: :any,
