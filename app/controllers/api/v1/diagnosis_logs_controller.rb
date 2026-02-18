@@ -1,4 +1,22 @@
 class Api::V1::DiagnosisLogsController < ApplicationController
+  # 診断履歴の一覧を取得
+  def index
+    # 1. ログインユーザーに紐づく履歴を取得
+    # .includes を使って「N+1問題」を回避し、関連する症状と薬を一括ロードする
+    @logs = current_user.diagnosis_logs
+                        .includes(:symptoms, :drugs)
+                        .order(created_at: :desc)
+
+    # 2. JSON形式で返却
+    # 履歴本体だけでなく、紐づく symptoms と drugs の name なども含める
+    render json: @logs.as_json(
+      include: {
+        symptoms: { only: [:id, :name] },
+        drugs: { only: [:id, :name, :description] }
+      }
+    ), status: :ok
+  end
+  
   def create
     # 1. フロントから送られてきた症状IDリストを受け取る
     symptom_ids = params[:symptom_ids]
