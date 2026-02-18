@@ -1,23 +1,27 @@
+// frontend/src/App.tsx
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
+import Home from './pages/Home'; 
+import Timing from './pages/Timing'; 
+import Diagnosis from './pages/Diagnosis';
+import Result from './pages/Result';
 
 const App = () => {
   return (
     <BrowserRouter>
-      {/* flex-col と min-h-screen で、フッターを常に一番下に配置します */}
       <div className="flex flex-col min-h-screen bg-white text-gray-900">
         <Header />
-        
-        {/* メインコンテンツ（ここが各画面の中身になる） */}
         <main className="flex-grow">
           <Routes>
-            <Route path="/" element={<div className="p-10 text-center text-xl font-bold">お酒を飲む前、飲んだ後。あなたの体調をサポート。</div>} />
+            <Route path="/" element={<Home />} /> {/* 予定の文字を Home に置き換え */}
             <Route path="/login" element={<div className="p-10 text-center">ログイン画面（準備中）</div>} />
             <Route path="/signup" element={<div className="p-10 text-center">新規登録画面（準備中）</div>} />
+            <Route path="/timing" element={<Timing />} />
+            <Route path="/diagnosis" element={<Diagnosis />} />
+            <Route path="/result" element={<Result />} />
           </Routes>
         </main>
-
         <Footer />
       </div>
     </BrowserRouter>
