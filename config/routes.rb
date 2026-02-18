@@ -3,7 +3,7 @@ Rails.application.routes.draw do
     namespace :v1 do
       get 'health_check', to: 'health_check#index'
       resources :symptoms, only: [:index]
-      resources :diagnosis_logs, only: [:create]
+      resources :diagnosis_logs, only: [:index,:create]
     end
   end
   # Deviseの認証用ルートを作成
