@@ -1,14 +1,13 @@
 class Api::V1::DiagnosisLogsController < ApplicationController
-  # 診断履歴の一覧を取得
+  # 一覧と詳細は「ログイン必須」にする（current_user が nil だとエラーになるため）
+  # 診断（create）だけは未ログインでもできるようにスキップ設定をするのが一般的です
+  before_action :authenticate_user!, only: [:index, :show]
+
   def index
-    # 1. ログインユーザーに紐づく履歴を取得
-    # .includes を使って「N+1問題」を回避し、関連する症状と薬を一括ロードする
     @logs = current_user.diagnosis_logs
                         .includes(:symptoms, :drugs)
                         .order(created_at: :desc)
 
-    # 2. JSON形式で返却
-    # 履歴本体だけでなく、紐づく symptoms と drugs の name なども含める
     render json: @logs.as_json(
       include: {
         symptoms: { only: [:id, :name] },
@@ -18,27 +17,23 @@ class Api::V1::DiagnosisLogsController < ApplicationController
   end
   
   def create
-    # 1. フロントから送られてきた症状IDリストを受け取る
     symptom_ids = params[:symptom_ids]
     timing = params[:timing]
 
-    # 2. Serviceクラス（専門家）を呼び出して、推奨薬を判定する
-    service = DiagnosisService.new(symptom_ids)
+    # 【修正ポイント1】Serviceクラスの引数を2つ（ids と timing）にする
+    # DiagnosisService.new(symptom_ids, timing) と定義されているため合わせる必要があります
+    service = DiagnosisService.new(symptom_ids, timing)
     @suggested_drugs = service.execute
 
-    # 3. 診断結果をDBに保存する（DiagnosisLog と中間テーブル）
-    # user_id はログインしていれば current_user.id、していなければ nil になります
     diagnosis_log = DiagnosisLog.new(
       user_id: current_user&.id,
       timing: timing
     )
 
     if diagnosis_log.save
-      # 診断に紐づく症状と薬を中間テーブルに保存
       diagnosis_log.symptom_ids = symptom_ids
       diagnosis_log.drug_ids = @suggested_drugs.pluck(:id)
 
-      # 4. 判定された薬の情報をJSONで返す
       render json: {
         status: 'success',
         diagnosis_log_id: diagnosis_log.id,
@@ -50,17 +45,17 @@ class Api::V1::DiagnosisLogsController < ApplicationController
   end
 
   def show
-  # ログインユーザーの履歴から、指定されたIDのものを1件取得
-  @log = current_user.diagnosis_logs
-                     .includes(:symptoms, :drugs)
-                     .find(params[:id])
+    # 【修正ポイント2】current_user が nil の場合に備え、ログインチェック済みのアクションにする
+    @log = current_user.diagnosis_logs
+                       .includes(:symptoms, :drugs)
+                       .find(params[:id])
 
-  render json: @log.as_json(
-    include: {
-      symptoms: { only: [:id, :name, :category] },
-      drugs: { only: [:id, :name, :description, :category] }
-    }
-  ), status: :ok
+    render json: @log.as_json(
+      include: {
+        symptoms: { only: [:id, :name, :category] },
+        drugs: { only: [:id, :name, :description, :category] }
+      }
+    ), status: :ok
   rescue ActiveRecord::RecordNotFound
     render json: { error: '履歴が見つかりませんでした' }, status: :not_found
   end
