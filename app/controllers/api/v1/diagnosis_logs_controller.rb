@@ -48,4 +48,20 @@ class Api::V1::DiagnosisLogsController < ApplicationController
       render json: { status: 'error', message: diagnosis_log.errors.full_messages }, status: :unprocessable_entity
     end
   end
+
+  def show
+  # ログインユーザーの履歴から、指定されたIDのものを1件取得
+  @log = current_user.diagnosis_logs
+                     .includes(:symptoms, :drugs)
+                     .find(params[:id])
+
+  render json: @log.as_json(
+    include: {
+      symptoms: { only: [:id, :name, :category] },
+      drugs: { only: [:id, :name, :description, :category] }
+    }
+  ), status: :ok
+  rescue ActiveRecord::RecordNotFound
+    render json: { error: '履歴が見つかりませんでした' }, status: :not_found
+  end
 end
