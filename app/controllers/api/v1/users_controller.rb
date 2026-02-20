@@ -1,18 +1,15 @@
 class Api::V1::UsersController < ApplicationController
-  before_action :authenticate_user! # ログイン必須
-
-  # マイページ表示用
   def show
-    render json: {
-      id: current_user.id,
-      email: current_user.email,
-      name: current_user.name # usersテーブルにnameカラムを追加した場合
-    }, status: :ok
+    # ApplicationController で作った current_user を呼ぶだけ！
+    if current_user
+      render json: { id: current_user.id, name: current_user.name, email: current_user.email }, status: :ok
+    else
+      render json: { error: "ユーザーが見つかりません" }, status: :unauthorized
+    end
   end
 
-  # プロフィール更新用
   def update
-    if current_user.update(user_params)
+    if current_user&.update(user_params)
       render json: { message: 'プロフィールを更新しました', user: current_user }, status: :ok
     else
       render json: { errors: current_user.errors.full_messages }, status: :unprocessable_entity

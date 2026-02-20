@@ -15,10 +15,10 @@ Devise.setup do |config|
     
     # ログイン・ログアウトのURLパターン
     jwt.dispatch_requests = [
-      ['POST', %r{^/login$}]
+      ['POST', %r{^/api/v1/auth/login$}]
     ]
     jwt.revocation_requests = [
-      ['DELETE', %r{^/logout$}]
+      ['DELETE', %r{^/api/v1/auth/logout$}]
     ]
     
     # 有効期限（1日）
@@ -322,6 +322,7 @@ Devise.setup do |config|
   # Note: These might become the new default in future versions of Devise.
   config.responder.error_status = :unprocessable_content
   config.responder.redirect_status = :see_other
+  config.navigational_formats = []
 
   # ==> Configuration for :registerable
 
