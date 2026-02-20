@@ -10,6 +10,10 @@ import { AuthProvider } from './context/AuthContext';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import MyPage from './pages/MyPage';
+import UserEdit from './pages/UserEdit';
+import DiagnosisHistory from './pages/DiagnosisHistory';
+import DiagnosisHistoryDetail from './pages/DiagnosisHistoryDetail';
+import { TermsOfService, PrivacyPolicy, Disclaimer } from './pages/StaticPages';
 
 const App = () => {
   return (
@@ -26,6 +30,12 @@ const App = () => {
               <Route path="/diagnosis" element={<Diagnosis />} />
               <Route path="/result" element={<Result />} />
               <Route path="/mypage" element={<MyPage />} />
+              <Route path="/mypage/edit" element={<UserEdit />} />
+              <Route path="/diagnosis/history" element={<DiagnosisHistory />} />
+              <Route path="/diagnosis/history/:id" element={<DiagnosisHistoryDetail />} />
+              <Route path="/terms" element={<TermsOfService />} />
+              <Route path="/privacy" element={<PrivacyPolicy />} />
+              <Route path="/disclaimer" element={<Disclaimer />} />
             </Routes>
           </main>
           <Footer />

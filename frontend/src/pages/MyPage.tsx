@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
+// 1. Link を追加
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import client from '../api/client';
-import { User, History, ChevronRight, LogOut, Loader2 } from 'lucide-react';
+// 2. Settings を追加
+import { User, History, ChevronRight, LogOut, Loader2, Settings } from 'lucide-react';
 
 interface UserData {
   name: string;
@@ -16,7 +19,6 @@ const MyPage = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        // Railsの UsersController#show (get 'me') を叩く
         const response = await client.get('/me');
         setUser(response.data);
       } catch (error) {
@@ -47,7 +49,11 @@ const MyPage = () => {
 
       {/* メニューリスト */}
       <div className="space-y-4">
-        <button className="w-full flex items-center justify-between p-5 bg-white rounded-2xl border border-gray-100 hover:border-primary transition-all group">
+        {/* 診断履歴を見る */}
+        <Link 
+          to="/diagnosis/history" 
+          className="w-full flex items-center justify-between p-5 bg-white rounded-2xl border border-gray-100 hover:border-primary transition-all group no-underline"
+        >
           <div className="flex items-center gap-4">
             <div className="bg-gray-50 p-3 rounded-xl group-hover:bg-orange-50 transition-colors">
               <History className="text-gray-600 group-hover:text-primary w-6 h-6" />
@@ -55,8 +61,23 @@ const MyPage = () => {
             <span className="font-bold text-gray-700">診断履歴を見る</span>
           </div>
           <ChevronRight className="text-gray-300 group-hover:text-primary" />
-        </button>
+        </Link>
 
+        {/* プロフィールを編集する */}
+        <Link 
+          to="/mypage/edit" 
+          className="w-full flex items-center justify-between p-5 bg-white rounded-2xl border border-gray-100 hover:border-primary transition-all group no-underline"
+        >
+          <div className="flex items-center gap-4">
+            <div className="bg-gray-50 p-3 rounded-xl group-hover:bg-orange-50 transition-colors">
+              <Settings className="text-gray-600 group-hover:text-primary w-6 h-6" />
+            </div>
+            <span className="font-bold text-gray-700">プロフィールを編集する</span>
+          </div>
+          <ChevronRight className="text-gray-300 group-hover:text-primary" />
+        </Link>
+
+        {/* ログアウト */}
         <button 
           onClick={logout}
           className="w-full flex items-center justify-between p-5 bg-white rounded-2xl border border-gray-100 hover:border-red-200 hover:bg-red-50 transition-all group"

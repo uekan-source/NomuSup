@@ -1,7 +1,6 @@
 class Api::V1::DiagnosisLogsController < ApplicationController
-  # 一覧と詳細は「ログイン必須」にする（current_user が nil だとエラーになるため）
-  # 診断（create）だけは未ログインでもできるようにスキップ設定をするのが一般的です
-  before_action :authenticate_user!, only: [:index, :show]
+  # 【修正】自作の認証メソッドを使用するように変更
+  before_action :ensure_logged_in, only: [:index, :show, :destroy]
 
   def index
     @logs = current_user.diagnosis_logs
@@ -20,13 +19,11 @@ class Api::V1::DiagnosisLogsController < ApplicationController
     symptom_ids = params[:symptom_ids]
     timing = params[:timing]
 
-    # 【修正ポイント1】Serviceクラスの引数を2つ（ids と timing）にする
-    # DiagnosisService.new(symptom_ids, timing) と定義されているため合わせる必要があります
     service = DiagnosisService.new(symptom_ids, timing)
     @suggested_drugs = service.execute
 
     diagnosis_log = DiagnosisLog.new(
-      user_id: current_user&.id,
+      user_id: current_user&.id, # ゲストの場合はnilが入る
       timing: timing
     )
 
@@ -45,7 +42,6 @@ class Api::V1::DiagnosisLogsController < ApplicationController
   end
 
   def show
-    # 【修正ポイント2】current_user が nil の場合に備え、ログインチェック済みのアクションにする
     @log = current_user.diagnosis_logs
                        .includes(:symptoms, :drugs)
                        .find(params[:id])
@@ -53,10 +49,30 @@ class Api::V1::DiagnosisLogsController < ApplicationController
     render json: @log.as_json(
       include: {
         symptoms: { only: [:id, :name, :category] },
-        drugs: { only: [:id, :name, :description, :category] }
+        drugs: { only: [:id, :name, :description] } # 薬にcategoryがない場合は消しておきます
       }
     ), status: :ok
   rescue ActiveRecord::RecordNotFound
     render json: { error: '履歴が見つかりませんでした' }, status: :not_found
+  end
+
+  def destroy
+    @log = current_user.diagnosis_logs.find(params[:id])
+    if @log.destroy
+      render json: { message: '履歴を削除しました' }, status: :ok
+    else
+      render json: { error: '削除に失敗しました' }, status: :unprocessable_entity
+    end
+  rescue ActiveRecord::RecordNotFound
+    render json: { error: '履歴が見つかりませんでした' }, status: :not_found
+  end
+
+  private
+
+  # 【追加】ログインしていない場合に401を返すメソッド
+  def ensure_logged_in
+    if current_user.nil?
+      render json: { error: "ログインが必要です" }, status: :unauthorized
+    end
   end
 end

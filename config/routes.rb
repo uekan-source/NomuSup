@@ -3,7 +3,7 @@ Rails.application.routes.draw do
     namespace :v1 do
       get 'health_check', to: 'health_check#index'
       resources :symptoms, only: [:index]
-      resources :diagnosis_logs, only: [:index, :show, :create]
+      resources :diagnosis_logs, only: [:index, :show, :create, :destroy]
       get 'me', to: 'users#show'
       patch 'me', to: 'users#update'
 
