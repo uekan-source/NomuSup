@@ -10,27 +10,29 @@ const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
- const handleSubmit = async (e: React.FormEvent) => {
+const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("1. 送信開始"); 
     try {
       const response = await client.post('/auth/login', { 
         user: { email, password } 
       });
 
-      console.log("2. Railsからのデータ:", response.data);
-
+      // Railsからのレスポンス構造に合わせてデータを取り出す
       const token = response.data.token;
-      console.log("3. 抽出したトークン:", token);
+      const userData = response.data.data; // ユーザー情報（nameなどが入っている場所）
 
-      if (token) {
-        login(token);
-        console.log("4. login関数呼び出し完了。Storageを確認してください。");
-        // ここで一旦止めて、Applicationタブにtokenが出たか見てください
-        setTimeout(() => navigate('/mypage'), 1000); 
+      if (token && userData) {
+        // --- 修正ポイント：tokenだけでなく、userDataも一緒に渡す ---
+        login(token, userData); 
+        
+        console.log("ログイン成功！ユーザー名:", userData.name);
+        navigate('/mypage');
+      } else {
+        console.error("データが不足しています", response.data);
       }
     } catch (error: any) {
       console.error("Login Error:", error.response?.data);
+      alert('ログインに失敗しました。');
     }
   };
 
