@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import client from '../api/client';
 
 // 1. 型定義に user を追加し、login がデータを受け取れるようにする
 interface AuthContextType {

@@ -34,14 +34,18 @@ const Signup = () => {
       const authHeader = response.headers['authorization'] || response.headers['Authorization'];
       const token = authHeader ? authHeader.split(' ')[1] : null;
 
-      if (token) {
-        login(token); // AuthContextを通じてlocalStorageへ保存
+      const userData = response.data.data || response.data;
+
+      if (token && userData) {
+        // ★ 修正：login(token) を login(token, userData) に変更！
+        login(token, userData); 
         navigate('/mypage');
       } else {
         // 万が一ボディに入っている場合
         const bodyToken = response.data.token;
-        if (bodyToken) {
-          login(bodyToken);
+        if (bodyToken && userData) {
+          // ★ 修正：ここも同様に userData を追加！
+          login(bodyToken, userData); 
           navigate('/mypage');
         } else {
           // どちらにもない場合はログイン画面へ
