@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import client from '../api/client';
-import type { Symptom, Drug } from '../types';
+import type { Symptom } from '../types';
 import { CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 
 const Diagnosis = () => {
