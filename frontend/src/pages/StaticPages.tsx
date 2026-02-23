@@ -1,6 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Scale, ShieldCheck, AlertTriangle } from 'lucide-react';
+// 【追加】先ほど作成した共通の免責事項コンポーネントをインポートします
+import { DisclaimerContent } from '../components/shared/DisclaimerContent';
 
 const StaticPageLayout = ({ title, icon: Icon, children }: { title: string, icon: any, children: React.ReactNode }) => {
   const navigate = useNavigate();
@@ -52,15 +54,9 @@ export const PrivacyPolicy = () => (
 );
 
 // --- 免責事項 ---
+// 【修正】直書きしていた<section>を消して、<DisclaimerContent />に置き換えます
 export const Disclaimer = () => (
   <StaticPageLayout title="免責事項" icon={AlertTriangle}>
-    <section>
-      <h2 className="text-lg font-bold text-gray-800 mb-2">1. 医療情報の取り扱い</h2>
-      <p>本サービスで提供される情報は一般的な知識に基づくものであり、医師の診断に代わるものではありません。症状が重い場合は必ず医療機関を受診してください。</p>
-    </section>
-    <section>
-      <h2 className="text-lg font-bold text-gray-800 mb-2">2. 損害への責任</h2>
-      <p>本サービスの利用によって生じた損害について、当方は一切の責任を負いません。</p>
-    </section>
+    <DisclaimerContent />
   </StaticPageLayout>
 );

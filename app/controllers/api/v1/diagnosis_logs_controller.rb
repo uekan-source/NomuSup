@@ -1,6 +1,6 @@
 class Api::V1::DiagnosisLogsController < ApplicationController
   # 【修正】自作の認証メソッドを使用するように変更
-  before_action :ensure_logged_in, only: [:index, :show, :destroy]
+  before_action :ensure_logged_in, only: [:index, :show, :create, :destroy]
 
   def index
     @logs = current_user.diagnosis_logs
@@ -10,31 +10,46 @@ class Api::V1::DiagnosisLogsController < ApplicationController
     render json: @logs.as_json(
       include: {
         symptoms: { only: [:id, :name] },
-        drugs: { only: [:id, :name, :description] }
+        drugs: { only: [:id, :name, :description, :pharmacist_advice] }
       }
     ), status: :ok
   end
   
-  def create
-    symptom_ids = params[:symptom_ids]
+  def calculate
+    symptom_ids = params[:symptom_ids] || []
     timing = params[:timing]
 
     service = DiagnosisService.new(symptom_ids, timing)
-    @suggested_drugs = service.execute
+    result = service.execute # { drugs: [...], summary: "..." } が返ってくる
 
-    diagnosis_log = DiagnosisLog.new(
-      user_id: current_user&.id, # ゲストの場合はnilが入る
+    render json: {
+      status: 'success',
+      suggested_drugs: result[:drugs],
+      result_summary: result[:summary], # 👈 ここを追加！
+      symptom_ids: symptom_ids,
       timing: timing
+    }, status: :ok
+  end
+
+  def create
+    symptom_ids = params[:symptom_ids]
+    timing = params[:timing]
+    drug_ids = params[:drug_ids]
+    result_summary = params[:result_summary] # 👈 フロントから受け取る
+
+    # 👈 buildの引数に result_summary を追加
+    diagnosis_log = current_user.diagnosis_logs.build(
+      timing: timing,
+      result_summary: result_summary 
     )
 
     if diagnosis_log.save
       diagnosis_log.symptom_ids = symptom_ids
-      diagnosis_log.drug_ids = @suggested_drugs.pluck(:id)
+      diagnosis_log.drug_ids = drug_ids
 
       render json: {
         status: 'success',
-        diagnosis_log_id: diagnosis_log.id,
-        suggested_drugs: @suggested_drugs
+        diagnosis_log_id: diagnosis_log.id
       }, status: :created
     else
       render json: { status: 'error', message: diagnosis_log.errors.full_messages }, status: :unprocessable_entity
@@ -49,7 +64,7 @@ class Api::V1::DiagnosisLogsController < ApplicationController
     render json: @log.as_json(
       include: {
         symptoms: { only: [:id, :name, :category] },
-        drugs: { only: [:id, :name, :description] } # 薬にcategoryがない場合は消しておきます
+        drugs: { only: [:id, :name, :description, :pharmacist_advice ] } # 薬にcategoryがない場合は消しておきます
       }
     ), status: :ok
   rescue ActiveRecord::RecordNotFound

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import client from '../api/client';
-import { ChevronLeft, Pill, AlertCircle, MessageCircle, Trash2, Loader2 } from 'lucide-react';
+import { ChevronLeft, Pill, AlertCircle, MessageCircle, Trash2, Loader2, Lightbulb } from 'lucide-react'; // 👈 Lightbulb を追加
 
 const DiagnosisHistoryDetail = () => {
   const { id } = useParams();
@@ -48,7 +48,7 @@ const DiagnosisHistoryDetail = () => {
           <span>履歴一覧に戻る</span>
         </button>
 
-        {/* --- 削除ボタンを追加 --- */}
+        {/* --- 削除ボタン --- */}
         <button 
           onClick={handleDelete}
           className="flex items-center gap-1 text-red-400 hover:text-red-600 transition-colors text-sm font-bold"
@@ -91,29 +91,48 @@ const DiagnosisHistoryDetail = () => {
             </div>
             <div className="space-y-4">
               {log.drugs?.map((drug: any) => (
-                <div key={drug.id} className="border border-gray-100 rounded-2xl p-4 flex gap-4 items-start">
-                  <div className="bg-gray-50 w-16 h-16 rounded-lg flex-shrink-0 flex items-center justify-center">
-                    <Pill className="text-gray-400 w-8 h-8" />
+                <div key={drug.id} className="border border-gray-100 rounded-2xl p-4">
+                  <div className="flex gap-4 items-start mb-4">
+                    <div className="bg-gray-50 w-16 h-16 rounded-lg flex-shrink-0 flex items-center justify-center">
+                      <Pill className="text-gray-400 w-8 h-8" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-gray-800">{drug.name}</h4>
+                      <p className="text-sm text-gray-500 mt-1">{drug.description}</p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="font-bold text-gray-800">{drug.name}</h4>
-                    <p className="text-sm text-gray-500 mt-1">{drug.description}</p>
-                  </div>
+                  
+                  {/* ▼ 追加：薬ごとのワンポイントアドバイス ▼ */}
+                  {drug.pharmacist_advice && (
+                    <div className="bg-orange-50/50 p-4 rounded-xl flex items-start gap-3 border border-orange-100">
+                      <Lightbulb className="text-primary w-5 h-5 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <span className="text-xs font-bold text-primary block mb-1">薬剤師のワンポイント</span>
+                        <p className="text-sm text-gray-700 leading-relaxed">
+                          {drug.pharmacist_advice}
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
           </section>
 
-          {/* 3. ワンポイント解説（もしデータにあれば） */}
-          <section className="bg-blue-50 rounded-2xl p-6">
-            <div className="flex items-center gap-2 mb-2 text-blue-700 font-bold">
-              <MessageCircle className="w-5 h-5" />
-              <h3>薬剤師からのアドバイス</h3>
-            </div>
-            <p className="text-blue-900 text-sm leading-relaxed">
-              当時の症状に基づいたアドバイスが表示されます。水分をしっかり摂り、安静に過ごしましょう。
-            </p>
-          </section>
+          {/* 3. ワンポイント解説（総評） */}
+          {/* 古いデータ（カラム追加前の診断履歴）でエラーにならないよう、log.result_summary がある時だけ表示 */}
+          {log.result_summary && (
+            <section className="bg-blue-50/50 p-6 rounded-3xl border border-blue-100 shadow-sm">
+              <div className="flex items-center gap-2 mb-3 text-blue-800 font-bold">
+                <MessageCircle className="w-6 h-6 text-blue-500" />
+                <h3>薬剤師からのアドバイス</h3>
+              </div>
+              <div className="text-blue-900 text-sm leading-loose whitespace-pre-wrap">
+                {log.result_summary}
+              </div>
+            </section>
+          )}
+
         </div>
       </div>
     </div>
