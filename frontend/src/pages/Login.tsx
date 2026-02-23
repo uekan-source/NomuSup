@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import client from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { LogIn, Mail, Lock } from 'lucide-react';
@@ -75,6 +75,12 @@ const handleSubmit = async (e: React.FormEvent) => {
           ログイン
         </button>
       </form>
+
+      <div className="mt-6 text-center">
+        <Link to="/forgot-password" className="text-sm text-primary font-bold hover:underline">
+          パスワードを忘れた方はこちら
+        </Link>
+      </div>
     </div>
   );
 };

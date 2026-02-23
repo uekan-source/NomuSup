@@ -18,6 +18,8 @@ Rails.application.routes.draw do
         post 'auth/signup', to: 'auth/registrations#create'
         post 'auth/login', to: 'auth/sessions#create'
         delete 'auth/logout', to: 'auth/sessions#destroy'
+        post 'auth/password', to: 'auth/passwords#create' # メール送信依頼用
+        put 'auth/password', to: 'auth/passwords#update'  # 新パスワード設定用
       end
     end
   end
