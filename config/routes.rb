@@ -3,7 +3,11 @@ Rails.application.routes.draw do
     namespace :v1 do
       get 'health_check', to: 'health_check#index'
       resources :symptoms, only: [:index]
-      resources :diagnosis_logs, only: [:index, :show, :create, :destroy]
+      resources :diagnosis_logs, only: [:index, :show, :create, :destroy] do
+        collection do
+          post :calculate # 診断のみ（DB保存しない）
+        end
+      end
       get 'me', to: 'users#show'
       patch 'me', to: 'users#update'
 

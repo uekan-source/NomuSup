@@ -20,6 +20,7 @@ export interface Drug {
   category: number;    // 0:DS(医薬品), 1:コンビニ(食品)
   timing: number;
   description: string;
+  pharmacist_advice?: string;
 }
 
 // 診断履歴の型：診断結果画面やマイページの一覧で使います

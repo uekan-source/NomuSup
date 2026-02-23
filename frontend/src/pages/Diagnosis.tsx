@@ -41,7 +41,7 @@ const Diagnosis = () => {
   // 2. 診断実行（Railsのcreateアクションへ送る）
   const handleSubmit = async () => {
     try {
-      const response = await client.post('/diagnosis_logs', {
+      const response = await client.post('/diagnosis_logs/calculate', {
         symptom_ids: selectedIds,
         timing: parseInt(timing)
       });

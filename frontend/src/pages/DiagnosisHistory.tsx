@@ -22,14 +22,13 @@ const DiagnosisHistory = () => {
     fetchLogs();
   }, []);
 
-  // 飲酒タイミングの数値表示をテキストに変換（Railsのenum等に合わせて調整してください）
-  const getTimingText = (timing: number) => {
-    const timings: { [key: number]: string } = {
-      1: '飲酒前',
-      2: '飲酒後',
-      3: '翌朝',
-    };
-    return timings[timing] || '不明';
+// 飲酒タイミングの表示をテキストに変換（Railsのenumの文字列にも対応）
+  const getTimingText = (timing: string | number) => {
+    if (timing === 0 || timing === 'before_drinking') return 'これから飲む';
+    if (timing === 1 || timing === 'during_drinking') return '飲みすぎた';
+    if (timing === 2 || timing === 'after_drinking') return '翌朝がつらい';
+    
+    return '不明';
   };
 
   if (loading) return (

@@ -1,18 +1,49 @@
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import client from '../api/client';
 import type { Drug } from '../types';
-import { Sparkles, ShoppingCart, RefreshCcw, Info } from 'lucide-react';
+import { Sparkles, ShoppingCart, RefreshCcw, Info, Save, Lightbulb, MessageCircle } from 'lucide-react'; // 👈 MessageCircleを追加
 
-// Railsから返ってくるレスポンスの型定義
+// Railsからの返り値の型
 interface DiagnosisResponse {
   status: string;
-  diagnosis_log_id: string;
   suggested_drugs: Drug[];
+  symptom_ids: string[];
+  timing: number;
+  result_summary: string; // 👈 【追加】
 }
 
 const Result = () => {
   const location = useLocation();
-  // Diagnosis.tsx から渡された結果データを受け取る
+  const navigate = useNavigate();
+  const { isLoggedIn } = useAuth();
+  
   const data = location.state?.result as DiagnosisResponse;
+
+  const handleSaveResult = async () => {
+    if (!isLoggedIn) {
+      if (window.confirm('診断結果を保存するには会員登録が必要です。登録画面へ移動しますか？')) {
+        navigate('/signup');
+      }
+      return;
+    }
+
+    try {
+      const drugIds = data.suggested_drugs.map(d => d.id);
+
+      await client.post('/diagnosis_logs', {
+        timing: data.timing,
+        symptom_ids: data.symptom_ids,
+        drug_ids: drugIds,
+        result_summary: data.result_summary // 👈 【追加】保存時に総評も送る
+      });
+      
+      alert('診断履歴に保存しました！マイページからいつでも確認できます。');
+    } catch (error) {
+      console.error("保存エラー:", error);
+      alert('保存に失敗しました。既に保存されているか、通信エラーの可能性があります。');
+    }
+  };
 
   if (!data) return (
     <div className="text-center py-20">
@@ -31,12 +62,25 @@ const Result = () => {
         <p className="text-gray-500">ソムリエが最適な対策をセレクトしました</p>
       </div>
 
+      {/* ▼▼▼ ここから追加：薬剤師からの総評 ▼▼▼ */}
+      <div className="bg-blue-50/50 p-6 rounded-3xl border border-blue-100 mb-8 shadow-sm">
+        <div className="flex items-center gap-2 mb-3 text-blue-800 font-bold">
+          <MessageCircle className="w-6 h-6 text-blue-500" />
+          <h3>薬剤師からのアドバイス</h3>
+        </div>
+        <div className="text-blue-900 text-sm leading-loose whitespace-pre-wrap">
+          {data.result_summary}
+        </div>
+      </div>
+      {/* ▲▲▲ ここまで追加 ▲▲▲ */}
+
       <div className="space-y-6">
         {data.suggested_drugs.map((drug, index) => (
           <div 
             key={drug.id} 
             className={`bg-white rounded-3xl p-6 border-2 transition-all shadow-sm ${index === 0 ? 'border-primary ring-4 ring-orange-50' : 'border-gray-100'}`}
           >
+            {/* ... (薬のカードの中身はそのまま) ... */}
             {index === 0 && (
               <span className="inline-block bg-primary text-white text-xs font-bold px-3 py-1 rounded-full mb-3">
                 BEST MATCH
@@ -59,6 +103,18 @@ const Result = () => {
               {drug.description}
             </p>
 
+            {drug.pharmacist_advice && (
+              <div className="bg-orange-50/50 p-4 rounded-xl mb-6 flex items-start gap-3 border border-orange-100">
+                <Lightbulb className="text-primary w-5 h-5 flex-shrink-0 mt-0.5" />
+                <div>
+                  <span className="text-xs font-bold text-primary block mb-1">薬剤師のワンポイント</span>
+                  <p className="text-sm text-gray-700 leading-relaxed">
+                    {drug.pharmacist_advice}
+                  </p>
+                </div>
+              </div>
+            )}
+
             <button className="w-full flex items-center justify-center gap-2 py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-black transition-colors">
               <ShoppingCart className="w-5 h-5" />
               詳細・購入を検討
@@ -67,7 +123,24 @@ const Result = () => {
         ))}
       </div>
 
-      <div className="mt-12 flex flex-col gap-4">
+      {/* ... (保存ボタンなどの下部コードはそのまま) ... */}
+      <div className="mt-10 p-6 bg-orange-50 rounded-3xl border border-orange-100 text-center">
+        <h4 className="font-bold text-gray-800 mb-3 flex items-center justify-center gap-2">
+          <Save className="w-5 h-5 text-primary" />
+          結果を記録に残しませんか？
+        </h4>
+        <p className="text-sm text-gray-600 mb-5">
+          保存すると、過去のコンディションと対策をいつでもマイページから振り返ることができます。
+        </p>
+        <button
+          onClick={handleSaveResult}
+          className="w-full py-4 bg-white border-2 border-primary text-primary rounded-full font-bold hover:bg-primary hover:text-white transition-all shadow-sm"
+        >
+          {isLoggedIn ? '診断結果を保存する' : '会員登録して結果を保存'}
+        </button>
+      </div>
+
+      <div className="mt-10 flex flex-col gap-4">
         <Link 
           to="/timing" 
           className="flex items-center justify-center gap-2 text-gray-600 font-bold py-4 hover:text-primary transition-colors"

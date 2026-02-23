@@ -1,26 +1,63 @@
 class DiagnosisService
   def initialize(symptom_ids, timing)
-    @symptom_ids = symptom_ids
-    @timing = timing
+    @symptom_ids = symptom_ids || []
+    @timing = timing.to_i
   end
 
   def execute
-    # 1. 該当する薬と、その「症状のカテゴリ」を一緒に取得
-    matched_data = Drug.joins(drug_symptoms: :symptom)
-                       .where(drug_symptoms: { symptom_id: @symptom_ids })
-                       .select('drugs.*, symptoms.category AS symptom_category')
+    selected_symptoms = Symptom.where(id: @symptom_ids).index_by(&:id)
+    valid_drugs = Drug.where(timing: [@timing, 3]).includes(:drug_symptoms)
 
-    # 2. スコアリングを行う
-    drug_scores = Hash.new(0)
-    matched_data.each do |drug|
-      weight = (drug.symptom_category == 1) ? 2 : 1
-      drug_scores[drug.id] += weight
+    scored_drugs = valid_drugs.map do |drug|
+      score = 0
+      drug.drug_symptoms.each do |ds|
+        symptom = selected_symptoms[ds.symptom_id]
+        score += (symptom.category == 1) ? 2 : 1 if symptom
+      end
+      { drug: drug, score: score, random: rand }
     end
 
-    # 3. スコアの高い順にIDを並び替える
-    ranked_ids = drug_scores.sort_by { |_, score| -score }.map(&:first)
+    sorted_drugs = scored_drugs.sort_by do |item|
+      [-item[:score], item[:drug].category, item[:random]]
+    end
 
-    # 4. ID順に取得して返却（Rails 7以降の in_order_of を使用）
-    Drug.where(id: ranked_ids).in_order_of(:id, ranked_ids)
-  end # executeメソッドの終わり
-end # DiagnosisServiceクラスの終わり
+    suggested_drugs = sorted_drugs.map { |item| item[:drug] }.take(3)
+
+    # ▼ 追加：選ばれた症状の配列から総評を生成する
+    summary = generate_summary(selected_symptoms.values)
+
+    # 薬の配列と、総評テキストをハッシュにして返す
+    { drugs: suggested_drugs, summary: summary }
+  end
+
+  private
+
+  # 症状の名前からキーワードを拾って、最適なアドバイスを組み立てるメソッド
+  def generate_summary(symptoms)
+    names = symptoms.map(&:name)
+    advices = []
+
+    if names.any? { |n| n.include?('空腹') }
+      advices << "空腹でお酒を飲むとアルコールの吸収が急激に進み、胃粘膜も荒れやすくなります。まずは何か軽く胃に入れてからお酒を楽しみましょう。"
+    end
+    
+    if names.any? { |n| n.include?('頭痛') || n.include?('乾く') }
+      advices << "アルコールによる脱水が起きているサインです。お酒と同じかそれ以上の水分（水や経口補水液）をこまめに摂ることを強くおすすめします。"
+    end
+    
+    if names.any? { |n| n.include?('胃') || n.include?('吐き気') || n.include?('ムカムカ') }
+      advices << "胃腸がダメージを受けています。消化の良い温かいものを摂り、油物や刺激物は避けて胃を休ませてください。"
+    end
+    
+    if names.any? { |n| n.include?('弱い') || n.include?('赤く') || n.include?('ふらつく') }
+      advices << "アルコールの分解が追いついていない可能性があります。自分のペースを守り、無理な飲酒や一気飲みは絶対に控えてください。"
+    end
+
+    if advices.empty?
+      advices << "肝臓の代謝を助ける成分を摂りつつ、こまめな水分補給と十分な休息を心がけてください。"
+    end
+
+    # 複数のアドバイスが出た場合は改行で繋げる
+    advices.join("\n\n")
+  end
+end
