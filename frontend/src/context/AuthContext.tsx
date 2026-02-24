@@ -44,11 +44,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoggedIn(true);
   };
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    setUser(null); // 4. ログアウト時にクリア
-    setIsLoggedIn(false);
-    window.location.href = '/';
+  const logout = async () => {
+    try {
+      // Rails側にトークン無効化のリクエストを送る
+      await client.delete('/auth/logout');
+    } catch (error) {
+      console.error('ログアウト通信エラー', error);
+    } finally {
+      // 通信の成功・失敗に関わらず、フロント側の情報は消去してトップへ戻す
+      localStorage.removeItem('token');
+      setUser(null);
+      setIsLoggedIn(false);
+      window.location.href = '/';
+    }
   };
 
   return (
