@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import client from '../api/client';
@@ -17,6 +18,8 @@ const Result = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { isLoggedIn } = useAuth();
+
+  const [isSaved, setIsSaved] = useState(false);
   
   const data = location.state?.result as DiagnosisResponse;
 
@@ -38,6 +41,7 @@ const Result = () => {
         result_summary: data.result_summary // 👈 【追加】保存時に総評も送る
       });
       
+      setIsSaved(true);
       alert('診断履歴に保存しました！マイページからいつでも確認できます。');
     } catch (error) {
       console.error("保存エラー:", error);
@@ -134,9 +138,13 @@ const Result = () => {
         </p>
         <button
           onClick={handleSaveResult}
-          className="w-full py-4 bg-white border-2 border-primary text-primary rounded-full font-bold hover:bg-primary hover:text-white transition-all shadow-sm"
+          disabled={isSaved} // 保存済みならボタンを無効化
+          className={`w-full py-4 bg-white border-2 rounded-full font-bold transition-all shadow-sm flex justify-center items-center gap-2
+            ${isSaved 
+              ? 'border-gray-300 text-gray-400 cursor-not-allowed bg-gray-50' 
+              : 'border-primary text-primary hover:bg-primary hover:text-white'}`}
         >
-          {isLoggedIn ? '診断結果を保存する' : '会員登録して結果を保存'}
+          {isSaved ? '保存済み' : (isLoggedIn ? '診断結果を保存する' : '会員登録して結果を保存')}
         </button>
       </div>
 
