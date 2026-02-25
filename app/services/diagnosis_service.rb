@@ -8,12 +8,19 @@ class DiagnosisService
     selected_symptoms = Symptom.where(id: @symptom_ids).index_by(&:id)
     valid_drugs = Drug.where(timing: [@timing, 3]).includes(:drug_symptoms)
 
+    has_stomach_pain = selected_symptoms.values.any? { |s| s.name.include?('胃痛') || s.name.include?('胃に違和感') }
+
     scored_drugs = valid_drugs.map do |drug|
       score = 0
       drug.drug_symptoms.each do |ds|
         symptom = selected_symptoms[ds.symptom_id]
         score += (symptom.category == 1) ? 2 : 1 if symptom
       end
+
+      if has_stomach_pain && drug.name == 'バファリンA'
+        score -= 10 
+      end
+
       { drug: drug, score: score, random: rand }
     end
 
@@ -22,11 +29,8 @@ class DiagnosisService
     end
 
     suggested_drugs = sorted_drugs.map { |item| item[:drug] }.take(3)
-
-    # 選ばれた症状の配列から総評を生成する
     summary = generate_summary(selected_symptoms.values)
 
-    # 薬の配列と、総評テキストをハッシュにして返す
     { drugs: suggested_drugs, summary: summary }
   end
 
