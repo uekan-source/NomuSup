@@ -197,11 +197,11 @@ drugs_data = [
     pharmacist_advice: 'お腹がゴロゴロする、下痢気味、口内炎ができている等の胃腸トラブルを伴う二日酔いに適しています。' 
   },
   { 
-    name: 'ガスター10', 
+    name: 'スクラート胃腸薬', 
     category: 0, 
     timing: 1, 
-    description: 'H2ブロッカー。過剰な胃酸を抑える。', 
-    pharmacist_advice: '胃酸の分泌を強力に止めます。「胃がキリキリ痛む」時に有効ですが、消化機能も落ちるため、服用後は食事を控えめに。' 
+    description: '荒れた胃粘膜を直接保護・修復するスクラルファート配合。', 
+    pharmacist_advice: 'お酒で荒れた胃の患部に直接貼り付いてバリアを作ってくれます。第2類医薬品なので、薬剤師不在の時間帯でもドラッグストア等で比較的購入しやすいお薬です。' 
   },
   { 
     name: 'バファリンA', 
@@ -216,6 +216,13 @@ drugs_data = [
     timing: 0, 
     description: '胆汁酸の分泌を促進し、肝機能を改善。', 
     pharmacist_advice: '脂っこい食事と一緒に飲むお酒にはこれ。胆汁の働きを助け、油ものの消化と肝臓の解毒をダブルでサポートします。' 
+  },
+  { 
+    name: 'タイレノールA', 
+    category: 0, 
+    timing: 2, 
+    description: '空腹時でも飲める、胃に優しいアセトアミノフェン単一処方。', 
+    pharmacist_advice: 'ロキソニンやバファリン等で胃が痛くなりやすい方の頭痛におすすめです。ただし、お酒が抜けていない状態での服用は肝臓へ負担がかかるため、しっかり水分を摂って時間をおいてから服用してください。' 
   }
 ]
 
@@ -230,6 +237,9 @@ DrugIngredient.create!(drug: goreisan, ingredient: ingredients['五苓散エキ�
 
 ramune = Drug.find_by(name: 'ラムネ')
 DrugIngredient.create!(drug: ramune, ingredient: ingredients['ブドウ糖']) if ramune && ingredients['ブドウ糖']
+
+tylenol = Drug.find_by(name: 'タイレノールA')
+DrugIngredient.create!(drug: tylenol, ingredient: ingredients['アセトアミノフェン']) if tylenol && ingredients['アセトアミノフェン']
 
 
 # === ② 症状(Symptom)の紐付け（診断アルゴリズムのコア） ===
@@ -260,7 +270,8 @@ drug_symptom_mappings = {
   'パンシロン01+' => ['ムカムカする吐き気', '現在、胃痛がある'],
   '五苓散' => ['ズキズキする頭痛', 'むくみがひどい', '喉が異常に乾く', 'ムカムカする吐き気'],
   '半夏瀉心湯' => ['ムカムカする吐き気', '現在、胃痛がある'],
-  'ガスター10' => ['現在、胃痛がある'],
+  'スクラート胃腸薬' => ['現在、胃痛がある', 'ムカムカする吐き気'],
+  'タイレノールA' => ['ズキズキする頭痛'],
   'バファリンA' => ['ズキズキする頭痛'],
   'ウルソ' => ['今日はがっつり飲む予定', 'すでに胃に違和感がある']
 }
