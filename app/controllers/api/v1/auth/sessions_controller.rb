@@ -7,15 +7,13 @@ class Api::V1::Auth::SessionsController < Devise::SessionsController
     user = User.find_by(email: params[:user][:email])
 
     if user && user.valid_password?(params[:user][:password])
-      # --- ここを修正：トークンを明示的に生成 ---
-      # 第1引数はスコープ（通常は :user）、第2引数はユーザー、第3引数はaud（通常は nil）
       token, _payload = Warden::JWTAuth::UserEncoder.new.call(user, :user, nil)
 
       Rails.logger.info "Generated Token: #{token}"
       
       render json: {
         status: 'success',
-        token: token, # 生成したトークンを直接入れる
+        token: token, 
         data: user
       }, status: :ok
     else
@@ -28,7 +26,6 @@ class Api::V1::Auth::SessionsController < Devise::SessionsController
 
   # ログアウト（サインアウト）
   def destroy
-    # トークンを無効化する処理（revoke）が走り、ログアウトが完了します
     signed_out = (Devise.sign_out_all_scopes ? sign_out : sign_out(resource_name))
     render json: {
       status: 'success',

@@ -1,6 +1,5 @@
 class Api::V1::UsersController < ApplicationController
   def show
-    # ApplicationController で作った current_user を呼ぶだけ！
     if current_user
       render json: { id: current_user.id, name: current_user.name, email: current_user.email }, status: :ok
     else

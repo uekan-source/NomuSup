@@ -1,11 +1,7 @@
 class ApplicationController < ActionController::API
 include ActionController::MimeResponds
-
-  # Deviseのパラメーター許可設定（既存のコード）
   before_action :configure_permitted_parameters, if: :devise_controller?
 
-  # --- 追加：自作の current_user メソッド ---
-  # どのコントローラーからでも呼べるようにします
   def current_user
     auth_header = request.headers['Authorization']
     token = auth_header.split(' ').last if auth_header.present?

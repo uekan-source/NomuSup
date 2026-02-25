@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { User, Mail, Save } from 'lucide-react';
 
 const UserEdit = () => {
-  const { user, login } = useAuth(); // login関数を使ってStateを更新する
+  const { user, login } = useAuth(); 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const navigate = useNavigate();

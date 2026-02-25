@@ -23,7 +23,7 @@ class DiagnosisService
 
     suggested_drugs = sorted_drugs.map { |item| item[:drug] }.take(3)
 
-    # ▼ 追加：選ばれた症状の配列から総評を生成する
+    # 選ばれた症状の配列から総評を生成する
     summary = generate_summary(selected_symptoms.values)
 
     # 薬の配列と、総評テキストをハッシュにして返す
@@ -32,7 +32,7 @@ class DiagnosisService
 
   private
 
-  # 症状の名前からキーワードを拾って、最適なアドバイスを組み立てるメソッド
+  # 症状の名前からキーワードを拾って、最適なアドバイスを組み立てる
   def generate_summary(symptoms)
     names = symptoms.map(&:name)
     advices = []

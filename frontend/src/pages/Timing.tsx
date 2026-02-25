@@ -4,7 +4,6 @@ import { GlassWater, Beer, Coffee, ChevronRight } from 'lucide-react';
 const Timing = () => {
   const navigate = useNavigate();
 
-  // 選択肢の定義
   const options = [
     { id: 0, label: 'これから飲む！', icon: <GlassWater />, description: '事前の準備で明日の自分を救おう' },
     { id: 1, label: '飲みすぎたかも...', icon: <Beer />, description: '今のうちにできるケアを提案' },
@@ -12,7 +11,6 @@ const Timing = () => {
   ];
 
   const handleSelect = (id: number) => {
-    // 次の質問画面へ移動（タイミングをURLパラメーターで渡す）
     navigate(`/diagnosis?timing=${id}`);
   };
 

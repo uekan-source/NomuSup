@@ -1,9 +1,8 @@
 import { Link } from 'react-router-dom';
 import { Beer, LogOut, User } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext'; // パスを修正！
+import { useAuth } from '../../context/AuthContext'; 
 
 const Header = () => {
-  // user（ユーザー情報）も受け取るように追加
   const { isLoggedIn, logout, user } = useAuth();
 
   return (
@@ -16,7 +15,6 @@ const Header = () => {
       <nav className="flex items-center gap-4">
         {isLoggedIn ? (
           <>
-            {/* 画面遷移図通り、ユーザー名を表示 */}
             <span className="text-gray-700 font-medium mr-2">
               {user?.name || 'ユーザー'} さん
             </span>

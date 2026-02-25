@@ -16,9 +16,7 @@ services:
     depends_on:
       - db
     environment:
-      # ↓ ここが重要！開発モードに強制指定
       RAILS_ENV: development
-      # ↓ コンソール等でも常にこのURLを使うように指示
       DATABASE_URL: postgres://postgres:password@db:5432/app_development
   frontend:
     image: node:20-slim

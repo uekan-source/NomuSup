@@ -11,7 +11,7 @@ interface DiagnosisResponse {
   suggested_drugs: Drug[];
   symptom_ids: string[];
   timing: number;
-  result_summary: string; // 👈 【追加】
+  result_summary: string; 
 }
 
 const Result = () => {
@@ -38,7 +38,7 @@ const Result = () => {
         timing: data.timing,
         symptom_ids: data.symptom_ids,
         drug_ids: drugIds,
-        result_summary: data.result_summary // 👈 【追加】保存時に総評も送る
+        result_summary: data.result_summary
       });
       
       setIsSaved(true);
@@ -66,7 +66,6 @@ const Result = () => {
         <p className="text-gray-500">ソムリエが最適な対策をセレクトしました</p>
       </div>
 
-      {/* ▼▼▼ ここから追加：薬剤師からの総評 ▼▼▼ */}
       <div className="bg-blue-50/50 p-6 rounded-3xl border border-blue-100 mb-8 shadow-sm">
         <div className="flex items-center gap-2 mb-3 text-blue-800 font-bold">
           <MessageCircle className="w-6 h-6 text-blue-500" />
@@ -76,7 +75,6 @@ const Result = () => {
           {data.result_summary}
         </div>
       </div>
-      {/* ▲▲▲ ここまで追加 ▲▲▲ */}
 
       <div className="space-y-6">
         {data.suggested_drugs.map((drug, index) => (
@@ -84,7 +82,6 @@ const Result = () => {
             key={drug.id} 
             className={`bg-white rounded-3xl p-6 border-2 transition-all shadow-sm ${index === 0 ? 'border-primary ring-4 ring-orange-50' : 'border-gray-100'}`}
           >
-            {/* ... (薬のカードの中身はそのまま) ... */}
             {index === 0 && (
               <span className="inline-block bg-primary text-white text-xs font-bold px-3 py-1 rounded-full mb-3">
                 BEST MATCH
@@ -127,7 +124,6 @@ const Result = () => {
         ))}
       </div>
 
-      {/* ... (保存ボタンなどの下部コードはそのまま) ... */}
       <div className="mt-10 p-6 bg-orange-50 rounded-3xl border border-orange-100 text-center">
         <h4 className="font-bold text-gray-800 mb-3 flex items-center justify-center gap-2">
           <Save className="w-5 h-5 text-primary" />

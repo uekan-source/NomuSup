@@ -9,14 +9,13 @@ const DiagnosisHistoryDetail = () => {
   const [log, setLog] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  // --- 削除処理を追加 ---
   const handleDelete = async () => {
     if (!window.confirm('この診断履歴を削除してもよろしいですか？')) return;
 
     try {
       await client.delete(`/diagnosis_logs/${id}`);
       alert('履歴を削除しました');
-      navigate('/diagnosis/history'); // 一覧に戻る
+      navigate('/diagnosis/history'); 
     } catch (error) {
       console.error("削除に失敗しました", error);
       alert('削除に失敗しました');
@@ -119,7 +118,6 @@ const DiagnosisHistoryDetail = () => {
             </div>
           </section>
 
-          {/* 3. ワンポイント解説（総評） */}
           {/* 古いデータ（カラム追加前の診断履歴）でエラーにならないよう、log.result_summary がある時だけ表示 */}
           {log.result_summary && (
             <section className="bg-blue-50/50 p-6 rounded-3xl border border-blue-100 shadow-sm">
