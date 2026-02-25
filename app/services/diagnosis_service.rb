@@ -12,20 +12,40 @@ class DiagnosisService
 
     scored_drugs = valid_drugs.map do |drug|
       score = 0
+      matched_count = 0 
+
       drug.drug_symptoms.each do |ds|
         symptom = selected_symptoms[ds.symptom_id]
-        score += (symptom.category == 1) ? 2 : 1 if symptom
+        if symptom
+          score += (symptom.category == 1) ? 2 : 1
+          matched_count += 1
+        end
       end
 
       if has_stomach_pain && drug.name == 'バファリンA'
-        score -= 10 
+        score -= 10
       end
 
-      { drug: drug, score: score, random: rand }
+      match_ratio = 0.0
+      if drug.drug_symptoms.size > 0 && score > 0
+        match_ratio = matched_count.to_f / drug.drug_symptoms.size
+      end
+
+      final_score = score + match_ratio
+
+      { drug: drug, score: final_score, random: rand, symptom_count: drug.drug_symptoms.size }
     end
 
+    scored_drugs.select! { |item| item[:score] > 0 }
+
+    # ランキングの並び替え
     sorted_drugs = scored_drugs.sort_by do |item|
-      [-item[:score], item[:drug].category, item[:random]]
+      [
+        -item[:score],         # 1. スコアが高い順
+        item[:symptom_count],  # 2. 薬の守備範囲が狭い順
+        item[:drug].category,  # 3. 医薬品優先
+        item[:random]          # 4. 最後にランダム
+      ]
     end
 
     suggested_drugs = sorted_drugs.map { |item| item[:drug] }.take(3)
@@ -36,7 +56,6 @@ class DiagnosisService
 
   private
 
-  # 症状の名前からキーワードを拾って、最適なアドバイスを組み立てる
   def generate_summary(symptoms)
     names = symptoms.map(&:name)
     advices = []
@@ -61,7 +80,6 @@ class DiagnosisService
       advices << "肝臓の代謝を助ける成分を摂りつつ、こまめな水分補給と十分な休息を心がけてください。"
     end
 
-    # 複数のアドバイスが出た場合は改行で繋げる
     advices.join("\n\n")
   end
 end

@@ -1,9 +1,4 @@
 Rails.application.routes.draw do
-  get 'magic_seed', to: proc {
-    # サーバーの裏側でマイグレーションとシードを強制実行する
-    result = `bin/rails db:migrate db:seed`
-    [200, {'Content-Type' => 'text/plain; charset=utf-8'}, ["実行完了しました！\n\n#{result}"]]
-  }
   namespace :api do
     namespace :v1 do
       get 'health_check', to: 'health_check#index'
