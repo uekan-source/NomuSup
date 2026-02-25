@@ -19,10 +19,9 @@ const handleSubmit = async (e: React.FormEvent) => {
 
       // Railsからのレスポンス構造に合わせてデータを取り出す
       const token = response.data.token;
-      const userData = response.data.data; // ユーザー情報（nameなどが入っている場所）
+      const userData = response.data.data; 
 
       if (token && userData) {
-        // --- 修正ポイント：tokenだけでなく、userDataも一緒に渡す ---
         login(token, userData); 
         
         console.log("ログイン成功！ユーザー名:", userData.name);

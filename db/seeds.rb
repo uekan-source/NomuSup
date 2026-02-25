@@ -219,24 +219,61 @@ drugs_data = [
   }
 ]
 
-drugs = drugs_data.map { |d| Drug.create!(d) }
+# 4. 紐付け (DrugSymptom / DrugIngredient) 
 
-# 4. 紐付け (DrugSymptom / DrugIngredient) - 代表的なもの
-# ヘパリーゼW × 空腹、お酒に弱い / 肝臓エキス
+# === ① 成分(Ingredient)の紐付け ===
 hepa_w = Drug.find_by(name: 'ヘパリーゼW')
-DrugSymptom.create!(drug: hepa_w, symptom: symptoms['空腹である'])
-DrugSymptom.create!(drug: hepa_w, symptom: symptoms['お酒に弱い体質である'])
-DrugIngredient.create!(drug: hepa_w, ingredient: ingredients['肝臓エキス'])
+DrugIngredient.create!(drug: hepa_w, ingredient: ingredients['肝臓エキス']) if hepa_w && ingredients['肝臓エキス']
 
-# 五苓散 × 頭痛、むくみ / 五苓散エキス
 goreisan = Drug.find_by(name: '五苓散')
-DrugSymptom.create!(drug: goreisan, symptom: symptoms['ズキズキする頭痛'])
-DrugSymptom.create!(drug: goreisan, symptom: symptoms['むくみがひどい'])
-DrugIngredient.create!(drug: goreisan, ingredient: ingredients['五苓散エキス'])
+DrugIngredient.create!(drug: goreisan, ingredient: ingredients['五苓散エキス']) if goreisan && ingredients['五苓散エキス']
 
-# ラムネ × ふらつく / ブドウ糖
 ramune = Drug.find_by(name: 'ラムネ')
-DrugSymptom.create!(drug: ramune, symptom: symptoms['少しふらつく'])
-DrugIngredient.create!(drug: ramune, ingredient: ingredients['ブドウ糖'])
+DrugIngredient.create!(drug: ramune, ingredient: ingredients['ブドウ糖']) if ramune && ingredients['ブドウ糖']
 
-puts "Seedデータの投入が完了しました！"
+
+# === ② 症状(Symptom)の紐付け（診断アルゴリズムのコア） ===
+# 薬の名前 => [効く症状の名前の配列] で定義
+drug_symptom_mappings = {
+  # --- コンビニ系 ---
+  'ヘパリーゼW' => ['空腹である', 'お酒に弱い体質である', '今日はがっつり飲む予定'],
+  'ウコンの力' => ['今日はがっつり飲む予定', 'お酒に弱い体質である'],
+  'ウコンの力 超MAX' => ['今日はがっつり飲む予定', '体がだるい', 'お酒に弱い体質である'],
+  'カゴメ トマトジュース' => ['顔が赤くなっている', '喉が異常に乾く'],
+  'ラムネ' => ['少しふらつく', '締めを食べたい欲求がある'],
+  'inゼリー エネルギー' => ['空腹である', 'すでに胃に違和感がある'],
+  'チョコラBBスパークリング' => ['体がだるい', '顔が赤くなっている'],
+  'ソルマック5' => ['すでに胃に違和感がある', '今日はがっつり飲む予定'],
+  '経口補水液OS-1' => ['喉が異常に乾く', 'ズキズキする頭痛', '少しふらつく'],
+  'ヘパリーゼHi' => ['体がだるい', '今日はがっつり飲む予定'],
+  'TBC 鉄分' => ['体がだるい', '少しふらつく'],
+  'ウィルキンソン炭酸水' => ['ビールなど炭酸系を多く飲む', '喉が異常に乾く'],
+  'ポカリスエット' => ['喉が異常に乾く', '顔が赤くなっている'],
+  'しじみ70個分のちから' => ['体がだるい', '締めを食べたい欲求がある'],
+  'リポビタンD' => ['体がだるい', '今日はがっつり飲む予定'],
+
+  # --- ドラッグストア系 ---
+  'ヘパリーゼGX' => ['お酒に弱い体質である', '今日はがっつり飲む予定', '体がだるい'],
+  'ハイチオールCプラス' => ['体がだるい', '顔が赤くなっている'],
+  'ミラグレーン錠' => ['お酒に弱い体質である', '体がだるい', '少しふらつく'],
+  '太田胃散' => ['すでに胃に違和感がある', 'ムカムカする吐き気', '現在、胃痛がある'],
+  'パンシロン01+' => ['ムカムカする吐き気', '現在、胃痛がある'],
+  '五苓散' => ['ズキズキする頭痛', 'むくみがひどい', '喉が異常に乾く', 'ムカムカする吐き気'],
+  '半夏瀉心湯' => ['ムカムカする吐き気', '現在、胃痛がある'],
+  'ガスター10' => ['現在、胃痛がある'],
+  'バファリンA' => ['ズキズキする頭痛'],
+  'ウルソ' => ['今日はがっつり飲む予定', 'すでに胃に違和感がある']
+}
+
+# 上のリストを元に、自動で一括紐付けを行う処理
+drug_symptom_mappings.each do |drug_name, symptom_names|
+  drug = Drug.find_by(name: drug_name)
+  symptom_names.each do |s_name|
+    symptom = symptoms[s_name]
+    if drug && symptom
+      DrugSymptom.create!(drug: drug, symptom: symptom)
+    end
+  end
+end
+
+puts "Seedデータの投入と紐付けが完了しました！"

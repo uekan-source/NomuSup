@@ -1,11 +1,11 @@
-// ユーザーの型：マイページやログイン状態で使います
+// ユーザーの型
 export interface User {
   id: string;
   email: string;
-  name?: string; // 名前は設定されていないこともあるので「?」をつけています
+  name?: string; 
 }
 
-// 症状の型：Railsの Symptom モデルに対応します
+// 症状の型：Railsの Symptom モデルに対応
 export interface Symptom {
   id: string;
   name: string;
@@ -13,7 +13,7 @@ export interface Symptom {
   category: number; // 0:症状, 1:体質
 }
 
-// 薬の型：Railsの Drug モデルに対応します
+// 薬の型：Railsの Drug モデルに対応
 export interface Drug {
   id: string;
   name: string;
@@ -23,7 +23,7 @@ export interface Drug {
   pharmacist_advice?: string;
 }
 
-// 診断履歴の型：診断結果画面やマイページの一覧で使います
+// 診断履歴の型：診断結果画面やマイページの一覧で使う
 export interface DiagnosisLog {
   id: string;
   user_id?: string;

@@ -1,7 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Scale, ShieldCheck, AlertTriangle } from 'lucide-react';
-// 【追加】先ほど作成した共通の免責事項コンポーネントをインポートします
 import { DisclaimerContent } from '../components/shared/DisclaimerContent';
 
 const StaticPageLayout = ({ title, icon: Icon, children }: { title: string, icon: any, children: React.ReactNode }) => {

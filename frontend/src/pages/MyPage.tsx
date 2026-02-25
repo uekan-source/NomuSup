@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react';
-// 1. Link を追加
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import client from '../api/client';
-// 2. Settings を追加
 import { User, History, ChevronRight, LogOut, Loader2, Settings } from 'lucide-react';
 
 interface UserData {

@@ -1,6 +1,5 @@
 @import "tailwindcss";
 
 @theme {
-  /* ここで primary カラーを定義します */
   --color-primary: #FF8C00;
 }

@@ -4,7 +4,7 @@ import client from '../api/client';
 // 1. 型定義に user を追加し、login がデータを受け取れるようにする
 interface AuthContextType {
   isLoggedIn: boolean;
-  user: any; // 必要に応じて { id: string; name: string; email: string } など定義してください
+  user: any; 
   login: (token: string, userData: any) => void; 
   logout: () => void;
 }
@@ -13,7 +13,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState<any>(null); // 2. ユーザー情報を保持するステートを追加
+  const [user, setUser] = useState<any>(null); 
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -37,7 +37,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     fetchUser();
   }, []);
 
-  // 3. ログイン時にユーザー情報もセットするように修正
   const login = (token: string, userData: any) => {
     localStorage.setItem('token', token);
     setUser(userData); 
@@ -51,7 +50,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error) {
       console.error('ログアウト通信エラー', error);
     } finally {
-      // 通信の成功・失敗に関わらず、フロント側の情報は消去してトップへ戻す
       localStorage.removeItem('token');
       setUser(null);
       setIsLoggedIn(false);

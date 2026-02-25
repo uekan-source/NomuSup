@@ -25,7 +25,7 @@ class Api::V1::DiagnosisLogsController < ApplicationController
     render json: {
       status: 'success',
       suggested_drugs: result[:drugs],
-      result_summary: result[:summary], # 👈 ここを追加！
+      result_summary: result[:summary], 
       symptom_ids: symptom_ids,
       timing: timing
     }, status: :ok
@@ -35,9 +35,8 @@ class Api::V1::DiagnosisLogsController < ApplicationController
     symptom_ids = params[:symptom_ids]
     timing = params[:timing]
     drug_ids = params[:drug_ids]
-    result_summary = params[:result_summary] # 👈 フロントから受け取る
+    result_summary = params[:result_summary] 
 
-    # 👈 buildの引数に result_summary を追加
     diagnosis_log = current_user.diagnosis_logs.build(
       timing: timing,
       result_summary: result_summary 
