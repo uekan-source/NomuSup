@@ -92,7 +92,7 @@ const Result = () => {
               <div>
                 <h3 className="text-2xl font-bold text-gray-800">{drug.name}</h3>
                 <span className="text-xs font-medium px-2 py-1 bg-gray-100 text-gray-500 rounded mt-1 inline-block">
-                  {drug.category === 0 ? '医薬品' : 'コンビニ等'}
+                  {String(drug.category) === 'medicine' ? 'ドラッグストア等' : 'コンビニ等'}
                 </span>
               </div>
               <div className="bg-orange-50 p-2 rounded-lg">

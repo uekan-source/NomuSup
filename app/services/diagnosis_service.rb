@@ -12,7 +12,7 @@ class DiagnosisService
 
     scored_drugs = valid_drugs.map do |drug|
       score = 0
-      matched_count = 0 
+      matched_count = 0
 
       drug.drug_symptoms.each do |ds|
         symptom = selected_symptoms[ds.symptom_id]
@@ -22,6 +22,7 @@ class DiagnosisService
         end
       end
 
+      # 💊 禁忌・リスク回避ロジック（胃痛時のNSAIDs除外）
       if has_stomach_pain && drug.name == 'バファリンA'
         score -= 10
       end
@@ -36,18 +37,20 @@ class DiagnosisService
       { drug: drug, score: final_score, random: rand, symptom_count: drug.drug_symptoms.size }
     end
 
-    scored_drugs.select! { |item| item[:score] > 0 }
+    # 🎯 スコアがマイナス（禁忌）の薬だけを除外する（スコア0の無難な薬は残す）
+    safe_drugs = scored_drugs.reject { |item| item[:score] < 0 }
 
     # ランキングの並び替え
-    sorted_drugs = scored_drugs.sort_by do |item|
+    sorted_drugs = safe_drugs.sort_by do |item|
       [
-        -item[:score],         # 1. スコアが高い順
-        item[:symptom_count],  # 2. 薬の守備範囲が狭い順
+        -item[:score],         # 1. スコアが高い順（マッチしているものを最優先）
+        item[:symptom_count],  # 2. 薬の守備範囲が狭い順（特化型を優先）
         item[:drug].category,  # 3. 医薬品優先
-        item[:random]          # 4. 最後にランダム
+        item[:random]          # 4. 同点（スコア0同士など）はランダム
       ]
     end
 
+    # 上位3つを確実に取得する（スコア0のものも穴埋めとして入る）
     suggested_drugs = sorted_drugs.map { |item| item[:drug] }.take(3)
     summary = generate_summary(selected_symptoms.values)
 
