@@ -4,6 +4,7 @@ class DiagnosisService
     @timing = timing.to_i
   end
 
+  # rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
   def execute
     selected_symptoms = Symptom.where(id: @symptom_ids).index_by(&:id)
     valid_drugs = Drug.where(timing: [@timing, 3]).includes(:drug_symptoms)
@@ -17,20 +18,16 @@ class DiagnosisService
       drug.drug_symptoms.each do |ds|
         symptom = selected_symptoms[ds.symptom_id]
         if symptom
-          score += (symptom.category == 1) ? 2 : 1
+          score += symptom.category == 1 ? 2 : 1
           matched_count += 1
         end
       end
 
       # 💊 禁忌・リスク回避ロジック（胃痛時のNSAIDs除外）
-      if has_stomach_pain && drug.name == 'バファリンA'
-        score -= 10
-      end
+      score -= 10 if has_stomach_pain && drug.name == 'バファリンA'
 
       match_ratio = 0.0
-      if drug.drug_symptoms.size > 0 && score > 0
-        match_ratio = matched_count.to_f / drug.drug_symptoms.size
-      end
+      match_ratio = matched_count.to_f / drug.drug_symptoms.size if drug.drug_symptoms.size.positive? && score.positive?
 
       final_score = score + match_ratio
 
@@ -38,7 +35,7 @@ class DiagnosisService
     end
 
     # 🎯 スコアがマイナス（禁忌）の薬だけを除外する（スコア0の無難な薬は残す）
-    safe_drugs = scored_drugs.reject { |item| item[:score] < 0 }
+    safe_drugs = scored_drugs.reject { |item| item[:score].negative? }
 
     # ランキングの並び替え
     sorted_drugs = safe_drugs.sort_by do |item|
@@ -51,38 +48,37 @@ class DiagnosisService
     end
 
     # 上位3つを確実に取得する（スコア0のものも穴埋めとして入る）
-    suggested_drugs = sorted_drugs.map { |item| item[:drug] }.take(3)
+    suggested_drugs = sorted_drugs.pluck(:drug).take(3)
     summary = generate_summary(selected_symptoms.values)
 
     { drugs: suggested_drugs, summary: summary }
   end
+  # rubocop:enable all
 
   private
 
+  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
   def generate_summary(symptoms)
     names = symptoms.map(&:name)
     advices = []
 
-    if names.any? { |n| n.include?('空腹') }
-      advices << "空腹でお酒を飲むとアルコールの吸収が急激に進み、胃粘膜も荒れやすくなります。まずは何か軽く胃に入れてからお酒を楽しみましょう。"
-    end
-    
+    advices << '空腹でお酒を飲むとアルコールの吸収が急激に進み、胃粘膜も荒れやすくなります。まずは何か軽く胃に入れてからお酒を楽しみましょう。' if names.any? { |n| n.include?('空腹') }
+
     if names.any? { |n| n.include?('頭痛') || n.include?('乾く') }
-      advices << "アルコールによる脱水が起きているサインです。お酒と同じかそれ以上の水分（水や経口補水液）をこまめに摂ることを強くおすすめします。"
-    end
-    
-    if names.any? { |n| n.include?('胃') || n.include?('吐き気') || n.include?('ムカムカ') }
-      advices << "胃腸がダメージを受けています。消化の良い温かいものを摂り、油物や刺激物は避けて胃を休ませてください。"
-    end
-    
-    if names.any? { |n| n.include?('弱い') || n.include?('赤く') || n.include?('ふらつく') }
-      advices << "アルコールの分解が追いついていない可能性があります。自分のペースを守り、無理な飲酒や一気飲みは絶対に控えてください。"
+      advices << 'アルコールによる脱水が起きているサインです。お酒と同じかそれ以上の水分（水や経口補水液）をこまめに摂ることを強くおすすめします。'
     end
 
-    if advices.empty?
-      advices << "肝臓の代謝を助ける成分を摂りつつ、こまめな水分補給と十分な休息を心がけてください。"
+    if names.any? { |n| n.include?('胃') || n.include?('吐き気') || n.include?('ムカムカ') }
+      advices << '胃腸がダメージを受けています。消化の良い温かいものを摂り、油物や刺激物は避けて胃を休ませてください。'
     end
+
+    if names.any? { |n| n.include?('弱い') || n.include?('赤く') || n.include?('ふらつく') }
+      advices << 'アルコールの分解が追いついていない可能性があります。自分のペースを守り、無理な飲酒や一気飲みは絶対に控えてください。'
+    end
+
+    advices << '肝臓の代謝を助ける成分を摂りつつ、こまめな水分補給と十分な休息を心がけてください。' if advices.empty?
 
     advices.join("\n\n")
   end
+  # rubocop:enable all
 end

@@ -1,10 +1,11 @@
 class ApplicationController < ActionController::API
-include ActionController::MimeResponds
+  include ActionController::MimeResponds
+
   before_action :configure_permitted_parameters, if: :devise_controller?
 
   def current_user
     auth_header = request.headers['Authorization']
-    token = auth_header.split(' ').last if auth_header.present?
+    token = auth_header.split.last if auth_header.present?
 
     # トークンがない（未ログイン・ゲスト）場合は nil を返す
     return nil if token.blank? || token == 'null'
@@ -13,7 +14,7 @@ include ActionController::MimeResponds
       # トークンがあれば解読してユーザーを探す
       payload = Warden::JWTAuth::TokenDecoder.new.call(token)
       User.find_by(id: payload['sub'])
-    rescue
+    rescue StandardError
       # トークンの期限切れや不正な場合はゲスト（nil）として扱う
       nil
     end

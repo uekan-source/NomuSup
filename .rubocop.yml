@@ -1,0 +1,36 @@
+# .rubocop.yml
+
+require:
+  - rubocop-rails
+
+AllCops:
+  NewCops: enable
+  Exclude:
+    - "vendor/**/*"
+    - "db/**/*"
+    - "config/**/*"
+    - "bin/*"
+    - "node_modules/**/*"
+    - "Gemfile"
+
+# クラスやモジュールにコメントを必須にしない（ポートフォリオでは不要なため）
+Style/Documentation:
+  Enabled: false
+
+# 文字列の凍結（# frozen_string_literal: true）を必須にしない
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+# 1行の文字数制限を少し緩めにする（デフォルトは80）
+Layout/LineLength:
+  Max: 120
+
+# メソッドの行数制限を少し緩めにする（デフォルトは10）
+Metrics/MethodLength:
+  Max: 20
+
+# ブロックの行数制限を少し緩めにする
+Metrics/BlockLength:
+  Exclude:
+    - "config/routes.rb"
+    - "spec/**/*" # 後でRSpecを入れた時のため
