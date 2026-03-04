@@ -1,9 +1,0 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
-
-one:
-  diagnosis_log: one
-  drug: one
-
-two:
-  diagnosis_log: two
-  drug: two

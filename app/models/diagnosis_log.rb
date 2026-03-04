@@ -6,5 +6,5 @@ class DiagnosisLog < ApplicationRecord
   has_many :diagnosis_log_drugs, dependent: :destroy
   has_many :drugs, through: :diagnosis_log_drugs
 
-  enum timing: { before_drinking: 0, during_drinking: 1, after_drinking: 2 }
+  enum :timing, { before_drinking: 0, during_drinking: 1, after_drinking: 2 }
 end
