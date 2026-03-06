@@ -1,0 +1,71 @@
+name: CI
+
+# どのタイミングでこのロボットを動かすか
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  # ----------------------------------------
+  # 1. RSpec（テスト）を実行するジョブ
+  # ----------------------------------------
+  rspec:
+    runs-on: ubuntu-latest
+
+    # テスト用のPostgreSQLデータベース（コンテナ）を用意する
+    services:
+      postgres:
+        image: postgres:15
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    # Railsに読み込ませる環境変数（データベースの接続先など）
+    env:
+      RAILS_ENV: test
+      DATABASE_URL: postgres://postgres:password@localhost:5432/nomusup_test
+
+    steps:
+      - name: コードをチェックアウト（GitHubからコードを取得）
+        uses: actions/checkout@v4
+
+      - name: RubyのセットアップとGemのインストール
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3.0' # ログから推測したRubyバージョンです
+          bundler-cache: true   # Gemのインストールを高速化（キャッシュ）する神設定
+
+      - name: データベースの作成とマイグレーション
+        run: |
+          bin/rails db:create
+          bin/rails db:schema:load
+
+      - name: RSpecの実行！
+        run: bundle exec rspec
+
+  # ----------------------------------------
+  # 2. RuboCop（コードの書き方チェック）を実行するジョブ
+  # ----------------------------------------
+  rubocop:
+    runs-on: ubuntu-latest
+    steps:
+      - name: コードをチェックアウト
+        uses: actions/checkout@v4
+
+      - name: RubyのセットアップとGemのインストール
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3.0'
+          bundler-cache: true
+
+      - name: RuboCopの実行！
+        run: bundle exec rubocop
