@@ -61,4 +61,8 @@ Rails.application.configure do
 
   # Raise error when a before_action's only/except options reference missing actions
   config.action_controller.raise_on_missing_callback_actions = true
+
+  config.action_dispatch.show_exceptions = :none
+  # テスト環境ではホスト制限を完全に無効化する
+  config.host_authorization = { exclude: ->(request) { true } }
 end
