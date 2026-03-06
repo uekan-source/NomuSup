@@ -1,11 +1,11 @@
 require 'rails_helper'
 
-RSpec.describe "Api::V1::Auth::Sessions", type: :request do
+RSpec.describe 'Api::V1::Auth::Sessions', type: :request do
   before do
     host! 'localhost'
   end
 
-  describe "POST /api/v1/auth/login (ログインAPI)" do
+  describe 'POST /api/v1/auth/login (ログインAPI)' do
     let(:user) { create(:user, email: 'test@example.com', password: 'password123') }
 
     context '正しいメールアドレスとパスワードを送信した場合' do
@@ -21,7 +21,7 @@ RSpec.describe "Api::V1::Auth::Sessions", type: :request do
         expect(response).to have_http_status(:success)
 
         # 2. 返ってきたJSONテキストをRubyで扱えるように変換（パース）する
-        json_response = JSON.parse(response.body)
+        json_response = response.parsed_body
 
         # 3. JSONの中に 'token' が存在していることを確認！
         expect(json_response['token']).to be_present

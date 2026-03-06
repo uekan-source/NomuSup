@@ -1,6 +1,6 @@
 # .rubocop.yml
 
-require:
+plugins:
   - rubocop-rails
 
 AllCops:
@@ -34,3 +34,6 @@ Metrics/BlockLength:
   Exclude:
     - "config/routes.rb"
     - "spec/**/*" # 後でRSpecを入れた時のため
+Rails/Exit:
+  Exclude:
+    - 'spec/rails_helper.rb'

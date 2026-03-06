@@ -14,7 +14,7 @@ RSpec.describe User, type: :model do
       it 'メールアドレスが空欄だと保存できないこと' do
         # わざとemailを空にしてダミーユーザーを作る
         user = build(:user, email: '')
-        
+
         # userが valid? ではない（無効である）ことを期待する
         expect(user).not_to be_valid
       end

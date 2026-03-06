@@ -13,12 +13,12 @@ RSpec.describe DiagnosisService, type: :service do
         # symptom_ids には症状の「ID」の配列を渡す
         symptom_ids = [stomach_pain.id]
         timing = 0 # 0: 飲酒前（例として設定）
-        
+
         # 2. Act（実行）
         # newのときに、idの配列とタイミングを渡す！
         service = DiagnosisService.new(symptom_ids, timing)
-        result = service.execute 
-        
+        result = service.execute
+
         # 3. Assert（検証）
         suggested_drug_names = result[:drugs].map(&:name)
         expect(suggested_drug_names).not_to include('バファリンA')
@@ -30,11 +30,11 @@ RSpec.describe DiagnosisService, type: :service do
         # 1. Arrange（準備）
         symptom_ids = [headache.id]
         timing = 0
-        
+
         # 2. Act（実行）
         service = DiagnosisService.new(symptom_ids, timing)
         result = service.execute
-        
+
         # 3. Assert（検証）
         suggested_drug_names = result[:drugs].map(&:name)
         expect(suggested_drug_names).to include('バファリンA')
