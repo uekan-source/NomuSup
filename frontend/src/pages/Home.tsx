@@ -1,102 +1,136 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-// 👇 新しく使うアイコン（GlassWater, ListChecks, Sparkles）を追加でインポートします
-import { ShieldCheck, Zap, History, ChevronRight, GlassWater, ListChecks, Sparkles } from 'lucide-react';
+import { ShieldCheck, Zap, History, ChevronRight, GlassWater, ListChecks, Sparkles, Beer, Coffee } from 'lucide-react';
 
 const Home = () => {
+  const [activeStep, setActiveStep] = useState(0);
+
+  const steps = [
+    { id: 1, title: 'いまの状態を選ぶ', desc: '「これから飲む」「二日酔い」など、あなたの状況を選択します。', icon: <GlassWater className="w-10 h-10" /> },
+    { id: 2, title: '症状をタップ', desc: '当てはまる症状や、あなたの体質をチェックリストから選びます。', icon: <ListChecks className="w-10 h-10" /> },
+    { id: 3, title: '最適な対策がわかる', desc: '薬剤師監修のロジックで、今すぐできるケアや市販薬をご提案します。', icon: <Sparkles className="w-10 h-10" /> }
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => setActiveStep((prev) => (prev + 1) % steps.length), 4000);
+    return () => clearInterval(timer);
+  }, [steps.length]);
+
   return (
-    <div className="flex flex-col animate-fadeIn">
-      {/* ヒーローセクション：一番目立つメインビジュアル */}
-      <section className="bg-gradient-to-b from-orange-50 to-white py-16 px-6 text-center">
-        <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 leading-tight">
-          今日の一杯を、<br />
-          <span className="text-primary">明日への活力に。</span>
-        </h1>
-        <p className="text-lg text-gray-600 mb-10 max-w-2xl mx-auto">
-          薬剤師監修のロジックで、あなたの今のコンディションに最適な二日酔い対策を提案します。
-        </p>
-        <Link 
-          to="/timing" 
-          className="inline-flex items-center gap-2 bg-primary text-white text-xl font-bold py-4 px-10 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all"
-        >
-          診断を始める
-          <ChevronRight className="w-6 h-6" />
-        </Link>
+    <div className="flex flex-col animate-fadeIn bg-white">
+      
+      {/* 1. ヒーローセクション（ビタミンオレンジのグラデーション） */}
+      <section className="relative bg-gradient-to-br from-orange-500 via-orange-400 to-orange-300 pt-20 pb-36 px-6 text-center overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-yellow-300/30 via-transparent to-transparent pointer-events-none"></div>
+        <div className="relative z-10 max-w-3xl mx-auto">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-6 leading-tight tracking-tight drop-shadow-md">
+            最高の一杯と、<br className="md:hidden" />
+            最高の翌朝を。
+          </h1>
+          <p className="text-lg text-orange-50 mb-8 max-w-2xl mx-auto leading-relaxed drop-shadow">
+            今のあなたの状態を選ぶだけ。<br className="hidden md:block"/>
+            薬剤師監修のロジックが、最適な対策を即座に導き出します。
+          </p>
+        </div>
       </section>
 
-      {/* ▼▼▼ ここから追加：使い方セクション ▼▼▼ */}
-      <section className="py-16 px-6 max-w-5xl mx-auto w-full">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-800">使い方は簡単３ステップ</h2>
-          <p className="text-gray-500 mt-3">会員登録なしでも、今すぐ診断できます</p>
-        </div>
-
-        {/* md:grid-cols-3 で、スマホなら縦並び、PCなら横に3つ並ぶようになります */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8">
-          
-          {/* Step 1 */}
-          <div className="relative text-center p-8 border-2 border-orange-100 rounded-3xl bg-orange-50/30">
-            {/* 上にはみ出す数字バッジ */}
-            <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-primary text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-xl border-4 border-white shadow-sm">1</div>
-            <div className="mt-2 mb-5 bg-white w-16 h-16 rounded-2xl flex items-center justify-center mx-auto shadow-sm text-primary">
+      {/* 2. ダイレクト分岐カード */}
+      <section className="relative z-20 max-w-5xl mx-auto px-6 -mt-24 mb-12 w-full">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
+          <Link to="/diagnosis?timing=0" className="group flex flex-col items-center bg-white/95 backdrop-blur-sm p-8 rounded-3xl shadow-xl shadow-orange-200/50 border-2 border-transparent hover:border-orange-400 transition-all duration-300 hover:-translate-y-1 no-underline">
+            <div className="bg-gradient-to-br from-orange-100 to-orange-50 text-primary w-16 h-16 rounded-2xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 shadow-inner">
               <GlassWater className="w-8 h-8" />
             </div>
-            <h3 className="font-bold text-lg mb-2">いまの状態を選ぶ</h3>
-            <p className="text-sm text-gray-600 leading-relaxed">「これから飲む」「二日酔い」など、あなたの状況を選択します。</p>
-          </div>
-
-          {/* Step 2 */}
-          <div className="relative text-center p-8 border-2 border-orange-100 rounded-3xl bg-orange-50/30">
-            <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-primary text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-xl border-4 border-white shadow-sm">2</div>
-            <div className="mt-2 mb-5 bg-white w-16 h-16 rounded-2xl flex items-center justify-center mx-auto shadow-sm text-primary">
-              <ListChecks className="w-8 h-8" />
+            <h3 className="text-xl font-bold text-gray-800 mb-2">これから飲む</h3>
+            <p className="text-sm text-gray-500 text-center mb-6 flex-grow">事前の準備で<br/>明日の自分を救う</p>
+            <div className="flex items-center text-primary font-bold text-sm bg-orange-50 px-5 py-2.5 rounded-full group-hover:bg-primary group-hover:text-white transition-colors">
+              診断へ進む <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
             </div>
-            <h3 className="font-bold text-lg mb-2">症状をタップ</h3>
-            <p className="text-sm text-gray-600 leading-relaxed">当てはまる症状や、あなたの体質をチェックリストから選びます。</p>
-          </div>
-
-          {/* Step 3 */}
-          <div className="relative text-center p-8 border-2 border-orange-100 rounded-3xl bg-orange-50/30">
-            <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-primary text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-xl border-4 border-white shadow-sm">3</div>
-            <div className="mt-2 mb-5 bg-white w-16 h-16 rounded-2xl flex items-center justify-center mx-auto shadow-sm text-primary">
-              <Sparkles className="w-8 h-8" />
+          </Link>
+          <Link to="/diagnosis?timing=1" className="group flex flex-col items-center bg-white/95 backdrop-blur-sm p-8 rounded-3xl shadow-xl shadow-orange-200/50 border-2 border-transparent hover:border-orange-400 transition-all duration-300 hover:-translate-y-1 no-underline">
+            <div className="bg-gradient-to-br from-orange-100 to-orange-50 text-primary w-16 h-16 rounded-2xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 shadow-inner">
+              <Beer className="w-8 h-8" />
             </div>
-            <h3 className="font-bold text-lg mb-2">最適な対策がわかる</h3>
-            <p className="text-sm text-gray-600 leading-relaxed">薬剤師監修のロジックで、今すぐできるケアや市販薬をご提案します。</p>
-          </div>
-
+            <h3 className="text-xl font-bold text-gray-800 mb-2">飲みすぎた</h3>
+            <p className="text-sm text-gray-500 text-center mb-6 flex-grow">今のうちにできる<br/>即効ケアを提案</p>
+            <div className="flex items-center text-primary font-bold text-sm bg-orange-50 px-5 py-2.5 rounded-full group-hover:bg-primary group-hover:text-white transition-colors">
+              診断へ進む <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </Link>
+          <Link to="/diagnosis?timing=2" className="group flex flex-col items-center bg-white/95 backdrop-blur-sm p-8 rounded-3xl shadow-xl shadow-orange-200/50 border-2 border-transparent hover:border-orange-400 transition-all duration-300 hover:-translate-y-1 no-underline">
+            <div className="bg-gradient-to-br from-orange-100 to-orange-50 text-primary w-16 h-16 rounded-2xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 shadow-inner">
+              <Coffee className="w-8 h-8" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-800 mb-2">翌朝がつらい</h3>
+            <p className="text-sm text-gray-500 text-center mb-6 flex-grow">二日酔いの症状を<br/>ピンポイントで緩和</p>
+            <div className="flex items-center text-primary font-bold text-sm bg-orange-50 px-5 py-2.5 rounded-full group-hover:bg-primary group-hover:text-white transition-colors">
+              診断へ進む <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </Link>
         </div>
       </section>
-      {/* ▲▲▲ ここまで追加 ▲▲▲ */}
 
-      {/* 特徴セクション：アプリの強みを3つ紹介（既存のコードそのまま） */}
-      <section className="py-16 px-6 bg-gray-50 border-t border-gray-100 w-full">
+      {/* 3. 使い方は簡単３ステップ */}
+      {/* 【変更点】全幅で明るいグラデーションを敷き、装飾の光（blur）を追加 */}
+      <section className="py-20 px-6 w-full bg-gradient-to-b from-orange-50 via-amber-100/60 to-orange-50 relative overflow-hidden">
+        {/* 背景のうっすらとした円形アクセント */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/60 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-orange-200/40 rounded-full blur-3xl translate-y-1/2 -translate-x-1/3"></div>
+
+        <div className="max-w-5xl mx-auto relative z-10">
+          <div className="bg-white/95 backdrop-blur-md rounded-[2.5rem] p-8 md:p-16 shadow-xl shadow-orange-200/50 border border-white">
+            <div className="text-center mb-10">
+              <h2 className="text-3xl font-bold text-gray-800">使い方は簡単３ステップ</h2>
+              <p className="text-orange-600/80 mt-3 font-medium">会員登録なしでも、今すぐ診断できます</p>
+            </div>
+            <div className="relative h-64 w-full max-w-lg mx-auto">
+              <div key={activeStep} className="absolute inset-0 flex flex-col items-center justify-center text-center p-8 bg-gradient-to-br from-orange-50/50 to-white border border-orange-100/50 rounded-3xl animate-fadeIn">
+                <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-orange-500 to-primary text-white w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl border-4 border-white shadow-md">
+                  {steps[activeStep].id}
+                </div>
+                <div className="mt-4 mb-5 bg-white w-20 h-20 rounded-2xl flex items-center justify-center mx-auto shadow-sm text-primary">
+                  {steps[activeStep].icon}
+                </div>
+                <h3 className="font-bold text-xl mb-3 text-gray-800">{steps[activeStep].title}</h3>
+                <p className="text-sm text-gray-600 leading-relaxed">{steps[activeStep].desc}</p>
+              </div>
+            </div>
+            <div className="flex justify-center gap-3 mt-8">
+              {steps.map((_, index) => (
+                <button key={index} onClick={() => setActiveStep(index)} className={`w-3 h-3 rounded-full transition-all duration-300 ${activeStep === index ? 'bg-primary w-8' : 'bg-orange-200 hover:bg-orange-300'}`} />
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 4. 特徴セクション */}
+      <section className="py-16 px-6 bg-orange-50/30 border-t border-orange-100/50 w-full">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-800">Nomu-Supの特徴</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center p-6 bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-              <div className="bg-orange-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
-                <ShieldCheck className="text-primary w-6 h-6" />
+            <div className="text-center p-8 bg-white rounded-3xl shadow-sm border border-orange-50 hover:shadow-md transition-shadow">
+              <div className="bg-orange-100 w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-5">
+                <ShieldCheck className="text-primary w-7 h-7" />
               </div>
-              <h3 className="font-bold text-lg mb-2">薬剤師監修</h3>
-              <p className="text-sm text-gray-500">あなたの体質や症状に合わせ、医学的視点から最適な薬や成分を提案。</p>
+              <h3 className="font-bold text-lg mb-3 text-gray-800">薬剤師監修</h3>
+              <p className="text-sm text-gray-500 leading-relaxed">あなたの体質や症状に合わせ、医学的視点から最適な薬や成分を提案。</p>
             </div>
-
-            <div className="text-center p-6 bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-              <div className="bg-orange-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Zap className="text-primary w-6 h-6" />
+            <div className="text-center p-8 bg-white rounded-3xl shadow-sm border border-orange-50 hover:shadow-md transition-shadow">
+              <div className="bg-orange-100 w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-5">
+                <Zap className="text-primary w-7 h-7" />
               </div>
-              <h3 className="font-bold text-lg mb-2">直感的な診断</h3>
-              <p className="text-sm text-gray-500">「飲む前・中・後」を選ぶだけ。たった数問で今のあなたに最適なケアが判明。</p>
+              <h3 className="font-bold text-lg mb-3 text-gray-800">直感的な診断</h3>
+              <p className="text-sm text-gray-500 leading-relaxed">「飲む前・中・後」を選ぶだけ。たった数問で今のあなたに最適なケアが判明。</p>
             </div>
-
-            <div className="text-center p-6 bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-              <div className="bg-orange-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
-                <History className="text-primary w-6 h-6" />
+            <div className="text-center p-8 bg-white rounded-3xl shadow-sm border border-orange-50 hover:shadow-md transition-shadow">
+              <div className="bg-orange-100 w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-5">
+                <History className="text-primary w-7 h-7" />
               </div>
-              <h3 className="font-bold text-lg mb-2">履歴を保存</h3>
-              <p className="text-sm text-gray-500">ログインすれば過去の診断履歴を保存。自分に合う対策がいつでも見返せる。</p>
+              <h3 className="font-bold text-lg mb-3 text-gray-800">履歴を保存</h3>
+              <p className="text-sm text-gray-500 leading-relaxed">ログインすれば過去の診断履歴を保存。自分に合う対策がいつでも見返せる。</p>
             </div>
           </div>
         </div>
