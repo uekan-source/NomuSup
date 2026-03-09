@@ -268,7 +268,7 @@ const Result = () => {
                     <div className="flex flex-col gap-3 mt-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <a 
-                          href={`http://googleusercontent.com/maps.google.com/9{mapQuery}`}
+                          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`}
                           target="_blank" rel="noopener noreferrer"
                           className={`flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold transition-colors ${
                             isMedicine 
