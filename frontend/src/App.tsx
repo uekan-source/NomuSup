@@ -15,6 +15,7 @@ import DiagnosisHistoryDetail from './pages/DiagnosisHistoryDetail';
 import { TermsOfService, PrivacyPolicy, Disclaimer } from './pages/StaticPages';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import Simulation from './pages/Simulation';
 
 const App = () => {
   return (
@@ -39,6 +40,7 @@ const App = () => {
               <Route path="/disclaimer" element={<Disclaimer />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/simulation" element={<Simulation />} />
             </Routes>
           </main>
           <Footer />

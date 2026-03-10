@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ShieldCheck, Zap, History, ChevronRight, GlassWater, ListChecks, Sparkles, Beer, Coffee } from 'lucide-react';
+import { ShieldCheck, Zap, History, ChevronRight, GlassWater, ListChecks, Sparkles, Beer, Coffee, Calculator } from 'lucide-react';
 
 const Home = () => {
   const [activeStep, setActiveStep] = useState(0);
@@ -68,6 +68,36 @@ const Home = () => {
             </div>
           </Link>
         </div>
+      </section>
+
+      <section className="max-w-5xl mx-auto px-6 mb-20 w-full relative z-20">
+        <Link to="/simulation" className="group block bg-gradient-to-r from-gray-800 to-gray-900 rounded-3xl p-1 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 no-underline">
+          <div className="bg-gray-900 rounded-[1.4rem] px-6 py-8 md:px-10 flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden relative">
+            {/* 背景の装飾光 */}
+            <div className="absolute right-0 top-0 w-64 h-64 bg-primary/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
+            
+            <div className="flex items-center gap-5 md:gap-6 relative z-10 w-full md:w-auto">
+              <div className="bg-gradient-to-br from-orange-400 to-primary w-14 h-14 md:w-16 md:h-16 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <Calculator className="w-7 h-7 md:w-8 md:h-8 text-white" />
+              </div>
+              <div className="flex-grow">
+                <h3 className="text-lg md:text-2xl font-bold text-white mb-1.5 flex items-center gap-2">
+                  アルコール分解シミュレーター
+                  <span className="bg-primary text-white text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">New</span>
+                </h3>
+                <p className="text-gray-400 text-xs md:text-sm">
+                  飲んだ量から、お酒が完全に抜ける時間を計算します
+                </p>
+              </div>
+            </div>
+            
+            <div className="w-full md:w-auto flex-shrink-0 relative z-10">
+              <div className="bg-white/10 hover:bg-white/20 text-white w-full md:w-auto px-6 py-3.5 rounded-full font-bold text-sm flex items-center justify-center gap-2 backdrop-blur-sm transition-colors border border-white/10">
+                計算してみる <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </div>
+          </div>
+        </Link>
       </section>
 
       {/* 3. 使い方は簡単３ステップ */}
