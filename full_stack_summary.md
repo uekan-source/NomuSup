@@ -1,3 +1,41 @@
+## File: ./frontend/eslint.config.js
+ ```js
+import js from '@eslint/js'
+import globals from 'globals'
+import reactHooks from 'eslint-plugin-react-hooks'
+import reactRefresh from 'eslint-plugin-react-refresh'
+import tseslint from 'typescript-eslint'
+import { defineConfig, globalIgnores } from 'eslint/config'
+
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      js.configs.recommended,
+      tseslint.configs.recommended,
+      reactHooks.configs.flat.recommended,
+      reactRefresh.configs.vite,
+    ],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: globals.browser,
+    },
+  },
+])
+ ```
+
+## File: ./frontend/tsconfig.json
+ ```json
+{
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ]
+}
+ ```
+
 ## File: ./frontend/package.json
  ```json
 {
@@ -46,6 +84,91 @@
 }
  ```
 
+## File: ./frontend/.vite/deps/_metadata.json
+ ```json
+{
+  "hash": "71c94930",
+  "configHash": "135df27c",
+  "lockfileHash": "2a31bdc1",
+  "browserHash": "abd568fe",
+  "optimized": {},
+  "chunks": {}
+} ```
+
+## File: ./frontend/index.html
+ ```html
+<!doctype html>
+<html lang="ja"> <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <title>Nomu-Sup | 薬剤師監修の二日酔い対策ソムリエ</title>
+    <meta name="description" content="今日の一杯を、明日への活力に。あなたの今のコンディションに最適な二日酔い対策を提案します。">
+
+    <meta property="og:site_name" content="Nomu-Sup" />
+    <meta property="og:title" content="Nomu-Sup | 薬剤師監修の二日酔い対策ソムリエ" />
+    <meta property="og:description" content="今日の一杯を、明日への活力に。あなたの今のコンディションに最適な二日酔い対策を提案します。" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://www.nomu-sup.com/" /> 
+    <meta property="og:image" content="https://www.nomu-sup.com/ogp-image.png" />
+
+    <meta name="twitter:card" content="summary_large_image" /> </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html> ```
+
+## File: ./frontend/tailwind.config.js
+ ```js
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        // アクティブな印象のオレンジを設定
+        primary: "#FF8C00", 
+      },
+    },
+  },
+  plugins: [],
+} ```
+
+## File: ./frontend/tsconfig.node.json
+ ```json
+{
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "module": "ESNext",
+    "types": ["node"],
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "erasableSyntaxOnly": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true
+  },
+  "include": ["vite.config.ts"]
+}
+ ```
+
 ## File: ./frontend/vite.config.ts
  ```ts
 import { defineConfig } from 'vite'
@@ -63,6 +186,47 @@ export default defineConfig({
     },
   },
 }) ```
+
+## File: ./frontend/postcss.config.js
+ ```js
+export default {
+  plugins: {
+    '@tailwindcss/postcss': {}, // ここを修正
+    autoprefixer: {},
+  },
+} ```
+
+## File: ./frontend/tsconfig.app.json
+ ```json
+{
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "target": "ES2022",
+    "useDefineForClassFields": true,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "types": ["vite/client"],
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "erasableSyntaxOnly": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true
+  },
+  "include": ["src"]
+}
+ ```
 
 ## File: ./frontend/src/App.css
  ```css
@@ -241,17 +405,33 @@ export default Footer; ```
 
 ## File: ./frontend/src/components/layout/Header.tsx
  ```tsx
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Beer, LogOut, User } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext'; 
 
 const Header = () => {
   const { isLoggedIn, logout, user } = useAuth();
+  const location = useLocation();
+
+  // 💡 【追加】現在のURLやステートから「翌朝モード」かどうかを判定
+  const searchParams = new URLSearchParams(location.search);
+  const timingParam = searchParams.get('timing');
+  const stateTiming = location.state?.result?.timing;
+
+  // 診断画面（URLパラメータ）または 結果画面（location.state）で timing === 2 なら翌朝モード
+  const isHangoverMode = 
+    (location.pathname === '/diagnosis' && timingParam === '2') ||
+    (location.pathname === '/result' && String(stateTiming) === '2');
+
+  // 💡 【追加】モードに応じたテーマカラーを定義
+  const iconColor = isHangoverMode ? 'text-cyan-500' : 'text-primary';
+  const hoverColor = isHangoverMode ? 'hover:text-cyan-500' : 'hover:text-primary';
+  const bgColor = isHangoverMode ? 'bg-cyan-500 hover:bg-cyan-600' : 'bg-primary hover:bg-orange-600';
 
   return (
-    <header className="bg-white border-b border-gray-200 py-4 px-6 flex justify-between items-center shadow-sm">
-      <Link to="/" className="flex items-center gap-2 no-underline">
-        <Beer className="text-primary w-8 h-8" />
+    <header className="bg-white border-b border-gray-200 py-4 px-6 flex justify-between items-center shadow-sm relative z-50 transition-colors duration-500">
+      <Link to="/" className="flex items-center gap-2 no-underline group">
+        <Beer className={`${iconColor} w-8 h-8 transition-colors duration-500`} />
         <span className="text-xl font-bold text-gray-800">Nomu-Sup</span>
       </Link>
 
@@ -261,7 +441,7 @@ const Header = () => {
             <span className="text-gray-700 font-medium mr-2">
               {user?.name || 'ユーザー'} さん
             </span>
-            <Link to="/mypage" className="text-gray-600 hover:text-primary transition-colors flex items-center gap-1">
+            <Link to="/mypage" className={`text-gray-600 transition-colors flex items-center gap-1 ${hoverColor}`}>
               <User className="w-4 h-4" />
               マイページ
             </Link>
@@ -272,8 +452,8 @@ const Header = () => {
           </>
         ) : (
           <>
-            <Link to="/login" className="text-gray-600 font-medium hover:text-primary">ログイン</Link>
-            <Link to="/signup" className="bg-primary text-white px-5 py-2 rounded-full font-bold">新規登録</Link>
+            <Link to="/login" className={`text-gray-600 font-medium transition-colors duration-300 ${hoverColor}`}>ログイン</Link>
+            <Link to="/signup" className={`${bgColor} text-white px-5 py-2 rounded-full font-bold transition-colors duration-300 shadow-sm`}>新規登録</Link>
           </>
         )}
       </nav>
@@ -394,6 +574,82 @@ const DisclaimerModal = () => {
 };
 
 export default DisclaimerModal; ```
+
+## File: ./frontend/src/components/shared/DiagnosisHeader.tsx
+ ```tsx
+import { useNavigate } from 'react-router-dom';
+import { ChevronLeft } from 'lucide-react';
+
+interface DiagnosisHeaderProps {
+  currentStep: number;
+  steps: { id: number; label: string }[];
+  // 💡 【追加】テーマカラーを外から受け取れるようにする（デフォルトはオレンジ）
+  theme?: 'orange' | 'blue'; 
+}
+
+const DiagnosisHeader = ({ currentStep, steps, theme = 'orange' }: DiagnosisHeaderProps) => {
+  const navigate = useNavigate();
+
+  // 💡 テーマに応じたカラークラスを定義
+  const isBlue = theme === 'blue';
+  const bgLineColor = isBlue ? 'bg-blue-100' : 'bg-orange-100';
+  const activeLineColor = isBlue ? 'bg-gradient-to-r from-blue-300 to-cyan-500' : 'bg-gradient-to-r from-orange-400 to-primary';
+  const activeCircleBg = isBlue ? 'bg-gradient-to-br from-blue-400 to-cyan-500 shadow-blue-200 ring-blue-50' : 'bg-gradient-to-br from-orange-400 to-primary shadow-orange-200 ring-orange-50';
+  const currentTextColor = isBlue ? 'text-cyan-600' : 'text-primary';
+
+  return (
+    <div className="mb-10 relative z-10">
+      <button
+        onClick={() => navigate(-1)}
+        className="flex items-center text-gray-500 hover:text-gray-800 transition-colors mb-8 font-medium group bg-white/50 backdrop-blur-sm px-3 py-1.5 rounded-full"
+      >
+        <ChevronLeft className="w-5 h-5 mr-1 group-hover:-translate-x-1 transition-transform" />
+        戻る
+      </button>
+
+      <div className="relative max-w-md mx-auto px-4">
+        {/* 背景のグレーの線 */}
+        <div className={`absolute left-0 top-4 w-full h-1 rounded-full z-0 transition-colors duration-500 ${bgLineColor}`}></div>
+        
+        {/* アクティブな色付きの線 */}
+        <div
+          className={`absolute left-0 top-4 h-1 rounded-full z-0 transition-all duration-500 ease-out shadow-sm ${activeLineColor}`}
+          style={{ width: `${((currentStep - 1) / (steps.length - 1)) * 100}%` }}
+        ></div>
+
+        <div className="relative z-10 flex justify-between">
+          {steps.map((step) => {
+            const isActive = currentStep >= step.id;
+            const isCurrent = currentStep === step.id;
+
+            return (
+              <div key={step.id} className="flex flex-col items-center">
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${
+                    isActive
+                      ? `${activeCircleBg} text-white shadow-md ring-4`
+                      : 'bg-white text-gray-300 ring-4 ring-white border border-gray-100'
+                  }`}
+                >
+                  {step.id}
+                </div>
+                <span
+                  className={`text-xs font-bold mt-2 whitespace-nowrap transition-colors duration-300 ${
+                    isCurrent ? `${currentTextColor} drop-shadow-sm` : isActive ? 'text-gray-700' : 'text-gray-400'
+                  }`}
+                >
+                  {step.label}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default DiagnosisHeader; ```
 
 ## File: ./frontend/src/pages/DiagnosisHistoryDetail.tsx
  ```tsx
@@ -684,105 +940,139 @@ export default Signup; ```
 
 ## File: ./frontend/src/pages/Home.tsx
  ```tsx
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-// 👇 新しく使うアイコン（GlassWater, ListChecks, Sparkles）を追加でインポートします
-import { ShieldCheck, Zap, History, ChevronRight, GlassWater, ListChecks, Sparkles } from 'lucide-react';
+import { ShieldCheck, Zap, History, ChevronRight, GlassWater, ListChecks, Sparkles, Beer, Coffee } from 'lucide-react';
 
 const Home = () => {
+  const [activeStep, setActiveStep] = useState(0);
+
+  const steps = [
+    { id: 1, title: 'いまの状態を選ぶ', desc: '「これから飲む」「二日酔い」など、あなたの状況を選択します。', icon: <GlassWater className="w-10 h-10" /> },
+    { id: 2, title: '症状をタップ', desc: '当てはまる症状や、あなたの体質をチェックリストから選びます。', icon: <ListChecks className="w-10 h-10" /> },
+    { id: 3, title: '最適な対策がわかる', desc: '薬剤師監修のロジックで、今すぐできるケアや市販薬をご提案します。', icon: <Sparkles className="w-10 h-10" /> }
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => setActiveStep((prev) => (prev + 1) % steps.length), 4000);
+    return () => clearInterval(timer);
+  }, [steps.length]);
+
   return (
-    <div className="flex flex-col animate-fadeIn">
-      {/* ヒーローセクション：一番目立つメインビジュアル */}
-      <section className="bg-gradient-to-b from-orange-50 to-white py-16 px-6 text-center">
-        <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 leading-tight">
-          今日の一杯を、<br />
-          <span className="text-primary">明日への活力に。</span>
-        </h1>
-        <p className="text-lg text-gray-600 mb-10 max-w-2xl mx-auto">
-          薬剤師監修のロジックで、あなたの今のコンディションに最適な二日酔い対策を提案します。
-        </p>
-        <Link 
-          to="/timing" 
-          className="inline-flex items-center gap-2 bg-primary text-white text-xl font-bold py-4 px-10 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all"
-        >
-          診断を始める
-          <ChevronRight className="w-6 h-6" />
-        </Link>
+    <div className="flex flex-col animate-fadeIn bg-white">
+      
+      {/* 1. ヒーローセクション（ビタミンオレンジのグラデーション） */}
+      <section className="relative bg-gradient-to-br from-orange-500 via-orange-400 to-orange-300 pt-20 pb-36 px-6 text-center overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-yellow-300/30 via-transparent to-transparent pointer-events-none"></div>
+        <div className="relative z-10 max-w-3xl mx-auto">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-6 leading-tight tracking-tight drop-shadow-md">
+            最高の一杯と、<br className="md:hidden" />
+            最高の翌朝を。
+          </h1>
+          <p className="text-lg text-orange-50 mb-8 max-w-2xl mx-auto leading-relaxed drop-shadow">
+            今のあなたの状態を選ぶだけ。<br className="hidden md:block"/>
+            薬剤師監修のロジックが、最適な対策を即座に導き出します。
+          </p>
+        </div>
       </section>
 
-      {/* ▼▼▼ ここから追加：使い方セクション ▼▼▼ */}
-      <section className="py-16 px-6 max-w-5xl mx-auto w-full">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-800">使い方は簡単３ステップ</h2>
-          <p className="text-gray-500 mt-3">会員登録なしでも、今すぐ診断できます</p>
-        </div>
-
-        {/* md:grid-cols-3 で、スマホなら縦並び、PCなら横に3つ並ぶようになります */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8">
-          
-          {/* Step 1 */}
-          <div className="relative text-center p-8 border-2 border-orange-100 rounded-3xl bg-orange-50/30">
-            {/* 上にはみ出す数字バッジ */}
-            <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-primary text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-xl border-4 border-white shadow-sm">1</div>
-            <div className="mt-2 mb-5 bg-white w-16 h-16 rounded-2xl flex items-center justify-center mx-auto shadow-sm text-primary">
+      {/* 2. ダイレクト分岐カード */}
+      <section className="relative z-20 max-w-5xl mx-auto px-6 -mt-24 mb-12 w-full">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
+          <Link to="/diagnosis?timing=0" className="group flex flex-col items-center bg-white/95 backdrop-blur-sm p-8 rounded-3xl shadow-xl shadow-orange-200/50 border-2 border-transparent hover:border-orange-400 transition-all duration-300 hover:-translate-y-1 no-underline">
+            <div className="bg-gradient-to-br from-orange-100 to-orange-50 text-primary w-16 h-16 rounded-2xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 shadow-inner">
               <GlassWater className="w-8 h-8" />
             </div>
-            <h3 className="font-bold text-lg mb-2">いまの状態を選ぶ</h3>
-            <p className="text-sm text-gray-600 leading-relaxed">「これから飲む」「二日酔い」など、あなたの状況を選択します。</p>
-          </div>
-
-          {/* Step 2 */}
-          <div className="relative text-center p-8 border-2 border-orange-100 rounded-3xl bg-orange-50/30">
-            <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-primary text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-xl border-4 border-white shadow-sm">2</div>
-            <div className="mt-2 mb-5 bg-white w-16 h-16 rounded-2xl flex items-center justify-center mx-auto shadow-sm text-primary">
-              <ListChecks className="w-8 h-8" />
+            <h3 className="text-xl font-bold text-gray-800 mb-2">これから飲む</h3>
+            <p className="text-sm text-gray-500 text-center mb-6 flex-grow">事前の準備で<br/>明日の自分を救う</p>
+            <div className="flex items-center text-primary font-bold text-sm bg-orange-50 px-5 py-2.5 rounded-full group-hover:bg-primary group-hover:text-white transition-colors">
+              診断へ進む <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
             </div>
-            <h3 className="font-bold text-lg mb-2">症状をタップ</h3>
-            <p className="text-sm text-gray-600 leading-relaxed">当てはまる症状や、あなたの体質をチェックリストから選びます。</p>
-          </div>
-
-          {/* Step 3 */}
-          <div className="relative text-center p-8 border-2 border-orange-100 rounded-3xl bg-orange-50/30">
-            <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-primary text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-xl border-4 border-white shadow-sm">3</div>
-            <div className="mt-2 mb-5 bg-white w-16 h-16 rounded-2xl flex items-center justify-center mx-auto shadow-sm text-primary">
-              <Sparkles className="w-8 h-8" />
+          </Link>
+          <Link to="/diagnosis?timing=1" className="group flex flex-col items-center bg-white/95 backdrop-blur-sm p-8 rounded-3xl shadow-xl shadow-orange-200/50 border-2 border-transparent hover:border-orange-400 transition-all duration-300 hover:-translate-y-1 no-underline">
+            <div className="bg-gradient-to-br from-orange-100 to-orange-50 text-primary w-16 h-16 rounded-2xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 shadow-inner">
+              <Beer className="w-8 h-8" />
             </div>
-            <h3 className="font-bold text-lg mb-2">最適な対策がわかる</h3>
-            <p className="text-sm text-gray-600 leading-relaxed">薬剤師監修のロジックで、今すぐできるケアや市販薬をご提案します。</p>
-          </div>
-
+            <h3 className="text-xl font-bold text-gray-800 mb-2">飲みすぎた</h3>
+            <p className="text-sm text-gray-500 text-center mb-6 flex-grow">今のうちにできる<br/>即効ケアを提案</p>
+            <div className="flex items-center text-primary font-bold text-sm bg-orange-50 px-5 py-2.5 rounded-full group-hover:bg-primary group-hover:text-white transition-colors">
+              診断へ進む <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </Link>
+          <Link to="/diagnosis?timing=2" className="group flex flex-col items-center bg-white/95 backdrop-blur-sm p-8 rounded-3xl shadow-xl shadow-orange-200/50 border-2 border-transparent hover:border-orange-400 transition-all duration-300 hover:-translate-y-1 no-underline">
+            <div className="bg-gradient-to-br from-orange-100 to-orange-50 text-primary w-16 h-16 rounded-2xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 shadow-inner">
+              <Coffee className="w-8 h-8" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-800 mb-2">翌朝がつらい</h3>
+            <p className="text-sm text-gray-500 text-center mb-6 flex-grow">二日酔いの症状を<br/>ピンポイントで緩和</p>
+            <div className="flex items-center text-primary font-bold text-sm bg-orange-50 px-5 py-2.5 rounded-full group-hover:bg-primary group-hover:text-white transition-colors">
+              診断へ進む <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </Link>
         </div>
       </section>
-      {/* ▲▲▲ ここまで追加 ▲▲▲ */}
 
-      {/* 特徴セクション：アプリの強みを3つ紹介（既存のコードそのまま） */}
-      <section className="py-16 px-6 bg-gray-50 border-t border-gray-100 w-full">
+      {/* 3. 使い方は簡単３ステップ */}
+      {/* 【変更点】全幅で明るいグラデーションを敷き、装飾の光（blur）を追加 */}
+      <section className="py-20 px-6 w-full bg-gradient-to-b from-orange-50 via-amber-100/60 to-orange-50 relative overflow-hidden">
+        {/* 背景のうっすらとした円形アクセント */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/60 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-orange-200/40 rounded-full blur-3xl translate-y-1/2 -translate-x-1/3"></div>
+
+        <div className="max-w-5xl mx-auto relative z-10">
+          <div className="bg-white/95 backdrop-blur-md rounded-[2.5rem] p-8 md:p-16 shadow-xl shadow-orange-200/50 border border-white">
+            <div className="text-center mb-10">
+              <h2 className="text-3xl font-bold text-gray-800">使い方は簡単３ステップ</h2>
+              <p className="text-orange-600/80 mt-3 font-medium">会員登録なしでも、今すぐ診断できます</p>
+            </div>
+            <div className="relative h-64 w-full max-w-lg mx-auto">
+              <div key={activeStep} className="absolute inset-0 flex flex-col items-center justify-center text-center p-8 bg-gradient-to-br from-orange-50/50 to-white border border-orange-100/50 rounded-3xl animate-fadeIn">
+                <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-orange-500 to-primary text-white w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl border-4 border-white shadow-md">
+                  {steps[activeStep].id}
+                </div>
+                <div className="mt-4 mb-5 bg-white w-20 h-20 rounded-2xl flex items-center justify-center mx-auto shadow-sm text-primary">
+                  {steps[activeStep].icon}
+                </div>
+                <h3 className="font-bold text-xl mb-3 text-gray-800">{steps[activeStep].title}</h3>
+                <p className="text-sm text-gray-600 leading-relaxed">{steps[activeStep].desc}</p>
+              </div>
+            </div>
+            <div className="flex justify-center gap-3 mt-8">
+              {steps.map((_, index) => (
+                <button key={index} onClick={() => setActiveStep(index)} className={`w-3 h-3 rounded-full transition-all duration-300 ${activeStep === index ? 'bg-primary w-8' : 'bg-orange-200 hover:bg-orange-300'}`} />
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 4. 特徴セクション */}
+      <section className="py-16 px-6 bg-orange-50/30 border-t border-orange-100/50 w-full">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-800">Nomu-Supの特徴</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center p-6 bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-              <div className="bg-orange-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
-                <ShieldCheck className="text-primary w-6 h-6" />
+            <div className="text-center p-8 bg-white rounded-3xl shadow-sm border border-orange-50 hover:shadow-md transition-shadow">
+              <div className="bg-orange-100 w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-5">
+                <ShieldCheck className="text-primary w-7 h-7" />
               </div>
-              <h3 className="font-bold text-lg mb-2">薬剤師監修</h3>
-              <p className="text-sm text-gray-500">あなたの体質や症状に合わせ、医学的視点から最適な薬や成分を提案。</p>
+              <h3 className="font-bold text-lg mb-3 text-gray-800">薬剤師監修</h3>
+              <p className="text-sm text-gray-500 leading-relaxed">あなたの体質や症状に合わせ、医学的視点から最適な薬や成分を提案。</p>
             </div>
-
-            <div className="text-center p-6 bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-              <div className="bg-orange-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Zap className="text-primary w-6 h-6" />
+            <div className="text-center p-8 bg-white rounded-3xl shadow-sm border border-orange-50 hover:shadow-md transition-shadow">
+              <div className="bg-orange-100 w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-5">
+                <Zap className="text-primary w-7 h-7" />
               </div>
-              <h3 className="font-bold text-lg mb-2">直感的な診断</h3>
-              <p className="text-sm text-gray-500">「飲む前・中・後」を選ぶだけ。たった数問で今のあなたに最適なケアが判明。</p>
+              <h3 className="font-bold text-lg mb-3 text-gray-800">直感的な診断</h3>
+              <p className="text-sm text-gray-500 leading-relaxed">「飲む前・中・後」を選ぶだけ。たった数問で今のあなたに最適なケアが判明。</p>
             </div>
-
-            <div className="text-center p-6 bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-              <div className="bg-orange-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
-                <History className="text-primary w-6 h-6" />
+            <div className="text-center p-8 bg-white rounded-3xl shadow-sm border border-orange-50 hover:shadow-md transition-shadow">
+              <div className="bg-orange-100 w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-5">
+                <History className="text-primary w-7 h-7" />
               </div>
-              <h3 className="font-bold text-lg mb-2">履歴を保存</h3>
-              <p className="text-sm text-gray-500">ログインすれば過去の診断履歴を保存。自分に合う対策がいつでも見返せる。</p>
+              <h3 className="font-bold text-lg mb-3 text-gray-800">履歴を保存</h3>
+              <p className="text-sm text-gray-500 leading-relaxed">ログインすれば過去の診断履歴を保存。自分に合う対策がいつでも見返せる。</p>
             </div>
           </div>
         </div>
@@ -799,20 +1089,28 @@ import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import client from '../api/client';
 import type { Symptom } from '../types';
-import { CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import DiagnosisHeader from '../components/shared/DiagnosisHeader';
+import { 
+  CheckCircle2, Loader2, ArrowRight, Sparkles, 
+  Utensils, Calendar, Beer, Activity, ThermometerSun, 
+  Wind, Droplets, Soup, AlertTriangle, Brain, Frown, 
+  BatteryWarning, CloudRain, HeartPulse, Droplet
+} from 'lucide-react';
 
 const Diagnosis = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const timing = searchParams.get('timing') || '0';
 
-  // 状態（State）の定義
-  const [symptoms, setSymptoms] = useState<Symptom[]>([]); // 症状リスト
-  const [constitutions, setConstitutions] = useState<Symptom[]>([]); // 体質リスト
-  const [selectedIds, setSelectedIds] = useState<string[]>([]); // 選択されたID
+  const isHangoverMode = timing === '2';
+
+  const [symptoms, setSymptoms] = useState<Symptom[]>([]);
+  const [constitutions, setConstitutions] = useState<Symptom[]>([]);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // 1. 画面表示時にRailsから質問を取得
+  const [wizardStep, setWizardStep] = useState<1 | 2 | 3>(1);
+
   useEffect(() => {
     const fetchSymptoms = async () => {
       try {
@@ -828,84 +1126,206 @@ const Diagnosis = () => {
     fetchSymptoms();
   }, [timing]);
 
-  // チェックボックスの切り替え
   const toggleSymptom = (id: string) => {
     setSelectedIds(prev => 
       prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
     );
   };
 
-  // 2. 診断実行（Railsのcreateアクションへ送る）
   const handleSubmit = async () => {
     try {
       const response = await client.post('/diagnosis_logs/calculate', {
         symptom_ids: selectedIds,
         timing: parseInt(timing)
       });
-      // 結果画面へ（取得した薬のデータを渡す）
       navigate('/result', { state: { result: response.data } });
     } catch (error) {
-      alert("診断に失敗しました。症状を選択してください。");
+      alert("診断に失敗しました。通信環境を確認してください。");
     }
   };
 
+  const getStepData = () => {
+    if (timing === '0') {
+      return {
+        header: [{ id: 1, label: '予定' }, { id: 2, label: '気分' }, { id: 3, label: '体質' }, { id: 4, label: '結果' }],
+        step1: symptoms.filter(s => s.name.includes('予定') || s.name.includes('炭酸')),
+        step2: symptoms.filter(s => s.name.includes('空腹')),
+        step3: constitutions,
+        title1: '今日の予定は？', title2: '今の気分・状況は？', title3: 'あなたの体質は？'
+      };
+    } else {
+      return {
+        header: [{ id: 1, label: '気分' }, { id: 2, label: '症状' }, { id: 3, label: '体質' }, { id: 4, label: '結果' }],
+        step1: symptoms.filter(s => s.name.includes('欲求') || s.name.includes('だるい')),
+        step2: symptoms.filter(s => !s.name.includes('欲求') && !s.name.includes('だるい')),
+        step3: constitutions,
+        title1: '今の気分は？', title2: '具体的な症状は？', title3: 'あなたの体質は？'
+      };
+    }
+  };
+
+  const currentConfig = getStepData();
+  const currentItems = wizardStep === 1 ? currentConfig.step1 : wizardStep === 2 ? currentConfig.step2 : currentConfig.step3;
+  const currentTitle = wizardStep === 1 ? currentConfig.title1 : wizardStep === 2 ? currentConfig.title2 : currentConfig.title3;
+
+  const getIconForText = (text: string, isSelected: boolean) => {
+    // 💡 翌朝モードの基本カラーを「水色（cyan）」に
+    const defaultColor = isHangoverMode ? 'text-cyan-500' : 'text-primary';
+    const iconClass = `w-7 h-7 flex-shrink-0 transition-colors duration-300 ${isSelected ? 'text-white' : defaultColor}`;
+    
+    if (text.includes('空腹')) return <Utensils className={iconClass} />;
+    if (text.includes('予定')) return <Calendar className={iconClass} />;
+    if (text.includes('炭酸')) return <Beer className={iconClass} />;
+    if (text.includes('弱い')) return <Activity className={iconClass} />;
+    if (text.includes('赤く')) return <ThermometerSun className={iconClass} />;
+    if (text.includes('ふらつく')) return <Wind className={iconClass} />;
+    if (text.includes('乾く')) return <Droplets className={iconClass} />;
+    if (text.includes('締め')) return <Soup className={iconClass} />;
+    if (text.includes('違和感')) return <AlertTriangle className={iconClass} />;
+    if (text.includes('頭痛')) return <Brain className={iconClass} />;
+    if (text.includes('吐き気')) return <Frown className={iconClass} />;
+    if (text.includes('だるい')) return <BatteryWarning className={iconClass} />;
+    if (text.includes('むくみ')) return <CloudRain className={iconClass} />;
+    if (text.includes('胃痛')) return <HeartPulse className={iconClass} />;
+    // 翌朝は「水滴」アイコンで水分補給の清涼感を演出
+    return isHangoverMode ? <Droplet className={iconClass} /> : <Sparkles className={iconClass} />;
+  };
+
   if (loading) return (
-    <div className="flex justify-center items-center h-64 text-primary">
+    <div className={`flex justify-center items-center h-screen ${isHangoverMode ? 'text-cyan-500 bg-blue-50/30' : 'text-primary'}`}>
       <Loader2 className="animate-spin w-10 h-10" />
     </div>
   );
 
   return (
-    <div className="max-w-2xl mx-auto py-10 px-6">
-      <h2 className="text-2xl font-bold mb-8 text-center">当てはまるものを教えてください</h2>
-
-      {/* 症状セクション */}
-      <div className="mb-10">
-        <h3 className="flex items-center gap-2 font-bold text-lg mb-4 text-gray-700">
-          <AlertCircle className="text-orange-400 w-5 h-5" /> 今の症状
-        </h3>
-        <div className="grid grid-cols-1 gap-3">
-          {symptoms.map(s => (
-            <label key={s.id} className={`flex items-center p-4 rounded-xl border-2 cursor-pointer transition-all ${selectedIds.includes(s.id) ? 'border-primary bg-orange-50' : 'border-gray-100 bg-white'}`}>
-              <input type="checkbox" className="hidden" onChange={() => toggleSymptom(s.id)} />
-              <CheckCircle2 className={`w-6 h-6 mr-3 ${selectedIds.includes(s.id) ? 'text-primary' : 'text-gray-200'}`} />
-              <span className="font-medium">{s.name}</span>
-            </label>
-          ))}
-        </div>
-      </div>
-
-      {/* 体質セクション */}
-<div className="mb-12">
-  <h3 className="flex items-center gap-2 font-bold text-lg mb-4 text-gray-700">
-    <CheckCircle2 className="text-green-400 w-5 h-5" /> あなたの体質・傾向
-  </h3>
-  <div className="space-y-3">
-    {constitutions.map(c => (
-      <div 
-        key={c.id} 
-        onClick={() => toggleSymptom(c.id)}
-        className="flex items-center justify-between p-4 bg-white rounded-2xl border border-gray-100 shadow-sm cursor-pointer hover:bg-gray-50 transition-all"
-      >
-        <span className="font-medium text-gray-700">{c.name}</span>
+    // 💡 【変更】背景を「白ヘッダーに馴染む淡い水色のグラデーション」に
+    <div className={`min-h-screen pt-6 pb-32 px-6 transition-colors duration-500 ${
+      isHangoverMode 
+        ? 'bg-gradient-to-br from-blue-50/80 via-white to-cyan-50/80' 
+        : 'bg-gradient-to-br from-orange-50/30 via-white to-orange-50/30'
+    }`}>
+      <div className="max-w-xl mx-auto">
         
-        {/* トグルスイッチ本体 */}
-        <div className={`relative w-12 h-6 rounded-full transition-colors duration-200 ${selectedIds.includes(c.id) ? 'bg-primary' : 'bg-gray-200'}`}>
-          {/* スイッチの中の白い丸 */}
-          <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full shadow-sm transition-transform duration-200 ${selectedIds.includes(c.id) ? 'translate-x-6' : 'translate-x-0'}`} />
-        </div>
-      </div>
-    ))}
-  </div>
-</div>
+        {/* 💡 ヘッダーにテーマカラーを渡す */}
+        <DiagnosisHeader 
+          currentStep={wizardStep} 
+          steps={currentConfig.header} 
+          theme={isHangoverMode ? 'blue' : 'orange'} 
+        />
 
-      <button 
-        onClick={handleSubmit}
-        disabled={selectedIds.length === 0}
-        className="w-full bg-primary text-white py-4 rounded-full text-xl font-bold shadow-lg hover:opacity-90 disabled:bg-gray-300 disabled:shadow-none transition-all"
-      >
-        診断結果を見る
-      </button>
+        <div className="animate-fadeIn">
+          <div className="text-center mb-10">
+            {/* 💡 テキストカラーを「深い青」にして視認性と優しさを両立 */}
+            <h2 className={`text-3xl font-bold mb-3 drop-shadow-sm transition-colors ${
+              isHangoverMode ? 'text-blue-900' : 'text-gray-800'
+            }`}>
+              {currentTitle}
+            </h2>
+            <p className={`text-sm font-medium transition-colors ${
+              isHangoverMode ? 'text-blue-600/80' : 'text-orange-600/80'
+            }`}>
+              当てはまるものをすべて選んでください
+            </p>
+          </div>
+          
+          <div className="flex flex-col gap-4">
+            {currentItems.length === 0 ? (
+              <p className={`text-center py-10 ${isHangoverMode ? 'text-blue-400' : 'text-gray-400'}`}>該当する項目がありません</p>
+            ) : (
+              currentItems.map(item => {
+                const isSelected = selectedIds.includes(item.id);
+                return (
+                  <button 
+                    key={item.id} 
+                    onClick={() => toggleSymptom(item.id)} 
+                    // 💡 【変更】カードは白ベースで、選択時に淡い水色に光るように
+                    className={`group flex items-center p-5 rounded-3xl border-2 text-left transition-all duration-300 w-full overflow-hidden relative
+                      ${isHangoverMode 
+                        ? (isSelected 
+                            ? 'border-transparent bg-blue-50/50 shadow-md transform scale-[1.02] ring-2 ring-cyan-400' 
+                            : 'border-white bg-white shadow-sm hover:border-blue-100 hover:shadow-md')
+                        : (isSelected 
+                            ? 'border-transparent bg-white shadow-lg shadow-orange-200/50 transform scale-[1.02] ring-2 ring-primary' 
+                            : 'border-white bg-white shadow-sm hover:shadow-md hover:border-orange-100')
+                      }`}
+                  >
+                    <div className={`absolute left-0 top-0 h-full w-2 transition-all duration-300 ${
+                      isSelected 
+                        ? (isHangoverMode ? 'bg-cyan-400' : 'bg-primary') 
+                        : 'bg-transparent'
+                    }`}></div>
+
+                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mr-5 transition-all duration-300 z-10
+                      ${isHangoverMode 
+                        ? (isSelected ? 'bg-gradient-to-br from-blue-400 to-cyan-400 shadow-inner' : 'bg-blue-50 group-hover:bg-blue-100')
+                        : (isSelected ? 'bg-gradient-to-br from-orange-400 to-primary shadow-inner' : 'bg-orange-50 group-hover:bg-orange-100')
+                      }
+                    `}>
+                      {getIconForText(item.name, isSelected)}
+                    </div>
+
+                    <span className={`text-lg font-bold flex-grow z-10 transition-colors duration-300 ${
+                      isHangoverMode 
+                        ? (isSelected ? 'text-blue-900' : 'text-gray-600')
+                        : (isSelected ? 'text-gray-900' : 'text-gray-600')
+                    }`}>
+                      {item.name}
+                    </span>
+
+                    <CheckCircle2 className={`w-6 h-6 z-10 transition-all duration-300 ${
+                      isSelected 
+                        ? `scale-110 opacity-100 ${isHangoverMode ? 'text-cyan-500' : 'text-primary'}` 
+                        : `scale-90 opacity-0 group-hover:opacity-50 text-gray-200`
+                    }`} />
+                  </button>
+                );
+              })
+            )}
+          </div>
+        </div>
+
+        {/* --- Sticky（画面下部固定）ナビゲーションボタン --- */}
+        <div className={`fixed bottom-0 left-0 w-full p-4 z-50 transition-colors duration-500 bg-white/80 backdrop-blur-xl border-t ${
+          isHangoverMode ? 'border-blue-50 shadow-[0_-10px_30px_-15px_rgba(0,100,255,0.05)]' : 'border-gray-100 shadow-[0_-10px_30px_-15px_rgba(0,0,0,0.1)]'
+        }`}>
+          <div className="max-w-xl mx-auto flex gap-3">
+            
+            {wizardStep > 1 && (
+              <button 
+                onClick={() => setWizardStep(prev => (prev - 1) as 1 | 2 | 3)} 
+                className={`px-6 py-4 rounded-full font-bold transition-all whitespace-nowrap shadow-sm border-2 bg-white ${
+                  isHangoverMode
+                    ? 'text-blue-500 border-blue-100 hover:border-cyan-300 hover:bg-blue-50'
+                    : 'text-gray-500 border-gray-200 hover:border-orange-300 hover:text-orange-500'
+                }`}
+              >
+                前へ
+              </button>
+            )}
+
+            <button 
+              onClick={wizardStep < 3 ? () => setWizardStep(prev => (prev + 1) as 1 | 2 | 3) : handleSubmit}
+              disabled={selectedIds.length === 0 && wizardStep === 3}
+              className={`flex-grow py-4 rounded-full text-lg font-bold transition-all flex items-center justify-center gap-2
+                ${selectedIds.length === 0 && wizardStep === 3
+                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-2 border-gray-200'
+                  : (isHangoverMode
+                      ? 'bg-gradient-to-r from-blue-400 to-cyan-500 text-white shadow-lg shadow-cyan-200/50 hover:shadow-xl hover:-translate-y-1'
+                      : 'bg-gradient-to-r from-orange-500 to-primary text-white shadow-lg shadow-orange-300/50 hover:shadow-xl hover:-translate-y-1')
+                }`}
+            >
+              {wizardStep < 3 ? (
+                <>次へ進む（{selectedIds.length}件選択中） <ArrowRight className="w-5 h-5" /></>
+              ) : selectedIds.length === 0 ? (
+                '1つ以上選択してください'
+              ) : (
+                <>診断結果を見る（{selectedIds.length}件選択中） {isHangoverMode ? <Droplet className="w-5 h-5" /> : <Sparkles className="w-5 h-5" />}</>
+              )}
+            </button>
+          </div>
+        </div>
+
+      </div>
     </div>
   );
 };
@@ -1072,9 +1492,31 @@ import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import client from '../api/client';
 import type { Drug } from '../types';
-import { Sparkles, ShoppingCart, RefreshCcw, Info, Save, Lightbulb, MessageCircle } from 'lucide-react'; // 👈 MessageCircleを追加
+import { 
+  Sparkles, ShoppingCart, RefreshCcw, Save, Lightbulb, 
+  MapPin, ExternalLink, ChevronDown, ChevronUp, UserCircle, Droplet
+} from 'lucide-react';
+import DiagnosisHeader from '../components/shared/DiagnosisHeader';
 
-// Railsからの返り値の型
+const customStyles = `
+  @keyframes bounce-subtle {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-10%) scale(1.05); }
+  }
+  .animate-bounce-subtle {
+    animation: bounce-subtle 2s infinite ease-in-out;
+  }
+
+  @keyframes fadeSlideInUp {
+    0% { opacity: 0; transform: translateY(30px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  .animate-fadeSlideInUp {
+    opacity: 0; 
+    animation: fadeSlideInUp 1s ease-out forwards;
+  }
+`;
+
 interface DiagnosisResponse {
   status: string;
   suggested_drugs: Drug[];
@@ -1089,8 +1531,15 @@ const Result = () => {
   const { isLoggedIn } = useAuth();
 
   const [isSaved, setIsSaved] = useState(false);
+  const [expandedCards, setExpandedCards] = useState<number[]>([]);
   
   const data = location.state?.result as DiagnosisResponse;
+
+  const isHangoverMode = data?.timing === 2;
+
+  const headerSteps = data?.timing === 0
+    ? [{ id: 1, label: '予定' }, { id: 2, label: '気分' }, { id: 3, label: '体質' }, { id: 4, label: '結果' }]
+    : [{ id: 1, label: '気分' }, { id: 2, label: '症状' }, { id: 3, label: '体質' }, { id: 4, label: '結果' }];
 
   const handleSaveResult = async () => {
     if (!isLoggedIn) {
@@ -1102,14 +1551,12 @@ const Result = () => {
 
     try {
       const drugIds = data.suggested_drugs.map(d => d.id);
-
       await client.post('/diagnosis_logs', {
         timing: data.timing,
         symptom_ids: data.symptom_ids,
         drug_ids: drugIds,
         result_summary: data.result_summary
       });
-      
       setIsSaved(true);
       alert('診断履歴に保存しました！マイページからいつでも確認できます。');
     } catch (error) {
@@ -1118,115 +1565,271 @@ const Result = () => {
     }
   };
 
+  const toggleCard = (index: number) => {
+    if (index === 0) return;
+    setExpandedCards(prev => 
+      prev.includes(index) ? prev.filter(i => i !== index) : [...prev, index]
+    );
+  };
+
   if (!data) return (
     <div className="text-center py-20">
       <p className="mb-4">結果が見つかりませんでした。</p>
-      <Link to="/" className="text-primary underline">トップへ戻る</Link>
+      <Link to="/" className="text-primary underline font-bold">トップへ戻る</Link>
+    </div>
+  );
+
+  const DELAY_STEP = 500;
+
+  const renderSaveSection = (isMobile: boolean) => (
+    <div 
+      className={`animate-fadeSlideInUp p-6 rounded-3xl border shadow-sm text-center transition-colors duration-500
+        ${isMobile ? 'block lg:hidden mt-10' : 'hidden lg:block'}
+        ${isHangoverMode ? 'bg-gradient-to-br from-blue-50 to-white border-blue-100' : 'bg-gradient-to-br from-orange-50 to-white border-orange-100'}`}
+      style={{ animationDelay: `${DELAY_STEP * (3 + data.suggested_drugs.length)}ms` }}
+    >
+      <h4 className="font-bold text-gray-800 mb-2 flex items-center justify-center gap-1.5 text-md">
+        <Save className={`w-4 h-4 ${isHangoverMode ? 'text-cyan-500' : 'text-primary'}`} />
+        記録に残しませんか？
+      </h4>
+      <p className="text-xs text-gray-500 mb-4 leading-relaxed">
+        マイページからいつでも振り返れます。
+      </p>
+      <button
+        onClick={handleSaveResult}
+        disabled={isSaved}
+        className={`w-full py-3.5 bg-white border-2 rounded-full font-bold text-sm transition-all shadow-sm flex justify-center items-center gap-2
+          ${isSaved 
+            ? 'border-gray-200 text-gray-400 cursor-not-allowed bg-gray-50' 
+            : (isHangoverMode 
+                ? 'border-cyan-500 text-cyan-600 hover:bg-cyan-500 hover:text-white hover:shadow-md'
+                : 'border-primary text-primary hover:bg-primary hover:text-white hover:shadow-md')}`}
+      >
+        {isSaved ? '保存済み' : (isLoggedIn ? '結果を保存する' : '会員登録して保存')}
+      </button>
+    </div>
+  );
+
+  const renderActionButtons = (isMobile: boolean) => (
+    <div 
+      className={`animate-fadeSlideInUp flex-col gap-3 relative z-10 ${isMobile ? 'flex lg:hidden mt-6' : 'hidden lg:flex'}`}
+      style={{ animationDelay: `${DELAY_STEP * (3 + data.suggested_drugs.length + 1)}ms` }}
+    >
+      <Link 
+        to="/diagnosis?timing=0" 
+        className={`flex items-center justify-center gap-2 text-gray-600 text-sm font-bold py-3.5 transition-colors bg-white rounded-full border-2 border-transparent
+          ${isHangoverMode ? 'hover:text-cyan-600' : 'hover:text-primary'}`}
+      >
+        <RefreshCcw className="w-4 h-4" />
+        もう一度診断する
+      </Link>
+      <Link 
+        to="/" 
+        className={`bg-white border-2 border-gray-200 text-center text-sm py-3.5 rounded-full font-bold text-gray-600 transition-all
+          ${isHangoverMode ? 'hover:border-cyan-500 hover:text-cyan-600' : 'hover:border-primary hover:text-primary'}`}
+      >
+        トップに戻る
+      </Link>
     </div>
   );
 
   return (
-    <div className="max-w-2xl mx-auto py-10 px-6 animate-fadeIn">
-      <div className="text-center mb-10">
-        <div className="inline-block bg-orange-100 p-3 rounded-full mb-4">
-          <Sparkles className="text-primary w-8 h-8" />
-        </div>
-        <h2 className="text-3xl font-extrabold mb-2">あなたへの処方箋</h2>
-        <p className="text-gray-500">ソムリエが最適な対策をセレクトしました</p>
+    <div className={`max-w-5xl mx-auto pt-6 pb-20 px-6 relative min-h-screen transition-colors duration-500 ${
+      isHangoverMode ? 'bg-gradient-to-br from-blue-50/80 via-white to-cyan-50/80' : 'bg-white'
+    }`}>
+      <style>{customStyles}</style>
+      
+      {/* 1. Header */}
+      <div className="animate-fadeSlideInUp max-w-2xl mx-auto" style={{ animationDelay: '0ms' }}>
+        <DiagnosisHeader currentStep={4} steps={headerSteps} theme={isHangoverMode ? 'blue' : 'orange'} />
       </div>
 
-      <div className="bg-blue-50/50 p-6 rounded-3xl border border-blue-100 mb-8 shadow-sm">
-        <div className="flex items-center gap-2 mb-3 text-blue-800 font-bold">
-          <MessageCircle className="w-6 h-6 text-blue-500" />
-          <h3>薬剤師からのアドバイス</h3>
+      {/* 2. Title */}
+      <div className="text-center mb-12 relative z-10 animate-fadeSlideInUp" style={{ animationDelay: `${DELAY_STEP * 1}ms` }}>
+        <div className={`inline-block p-3 rounded-full mb-4 shadow-lg ${
+          isHangoverMode ? 'bg-gradient-to-br from-blue-400 to-cyan-500 shadow-cyan-200' : 'bg-gradient-to-br from-orange-400 to-primary shadow-orange-200'
+        }`}>
+          {isHangoverMode ? <Droplet className="text-white w-8 h-8" /> : <Sparkles className="text-white w-8 h-8" />}
         </div>
-        <div className="text-blue-900 text-sm leading-loose whitespace-pre-wrap">
-          {data.result_summary}
-        </div>
+        <h2 className={`text-3xl lg:text-4xl font-extrabold mb-3 tracking-tight ${isHangoverMode ? 'text-blue-900' : 'text-gray-800'}`}>
+          あなたへの処方箋
+        </h2>
+        <p className={`font-medium text-sm lg:text-base ${isHangoverMode ? 'text-blue-600/80' : 'text-orange-600/80'}`}>
+          ソムリエが最適な対策をセレクトしました
+        </p>
       </div>
 
-      <div className="space-y-6">
-        {data.suggested_drugs.map((drug, index) => (
-          <div 
-            key={drug.id} 
-            className={`bg-white rounded-3xl p-6 border-2 transition-all shadow-sm ${index === 0 ? 'border-primary ring-4 ring-orange-50' : 'border-gray-100'}`}
-          >
-            {index === 0 && (
-              <span className="inline-block bg-primary text-white text-xs font-bold px-3 py-1 rounded-full mb-3">
-                BEST MATCH
-              </span>
-            )}
-            
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <h3 className="text-2xl font-bold text-gray-800">{drug.name}</h3>
-                <span className="text-xs font-medium px-2 py-1 bg-gray-100 text-gray-500 rounded mt-1 inline-block">
-                  {String(drug.category) === 'medicine' ? 'ドラッグストア等' : 'コンビニ等'}
+      <div className="flex flex-col lg:flex-row gap-10 items-start">
+        
+        {/* =========================================
+            左カラム：チャット風アドバイス
+        ========================================= */}
+        <div className="w-full lg:w-1/3 lg:sticky lg:top-24 space-y-8">
+          
+          <div className="animate-fadeSlideInUp" style={{ animationDelay: `${DELAY_STEP * 2}ms` }}>
+            <div className="flex gap-4 items-start">
+              
+              {/* 💡 薬剤師アバター：翌朝はエメラルド、通常はブルー */}
+              <div className="flex flex-col items-center gap-1 flex-shrink-0">
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center shadow-md
+                  ${isHangoverMode 
+                    ? 'bg-gradient-to-br from-emerald-400 to-emerald-600' 
+                    : 'bg-gradient-to-br from-blue-400 to-blue-600'}`}
+                >
+                  <UserCircle className="text-white w-8 h-8" />
+                </div>
+                <span className={`text-[10px] font-bold ${isHangoverMode ? 'text-emerald-600' : 'text-blue-600'}`}>
+                  薬剤師
                 </span>
               </div>
-              <div className="bg-orange-50 p-2 rounded-lg">
-                <Info className="text-primary w-5 h-5" />
-              </div>
-            </div>
 
-            <p className="text-gray-600 text-sm leading-relaxed mb-6">
-              {drug.description}
-            </p>
-
-            {drug.pharmacist_advice && (
-              <div className="bg-orange-50/50 p-4 rounded-xl mb-6 flex items-start gap-3 border border-orange-100">
-                <Lightbulb className="text-primary w-5 h-5 flex-shrink-0 mt-0.5" />
-                <div>
-                  <span className="text-xs font-bold text-primary block mb-1">薬剤師のワンポイント</span>
-                  <p className="text-sm text-gray-700 leading-relaxed">
-                    {drug.pharmacist_advice}
-                  </p>
+              {/* 💡 吹き出し：翌朝はエメラルド、通常はブルー */}
+              <div className={`relative p-5 rounded-2xl rounded-tl-none border shadow-sm flex-grow
+                ${isHangoverMode 
+                  ? 'bg-gradient-to-br from-emerald-50 to-white border-emerald-100' 
+                  : 'bg-gradient-to-br from-blue-50 to-white border-blue-100'}`}
+              >
+                <div className={`absolute top-0 -left-2 w-0 h-0 border-t-[0px] border-t-transparent border-r-[10px] border-b-[12px] border-b-transparent
+                  ${isHangoverMode ? 'border-r-emerald-50' : 'border-r-blue-50'}`}
+                ></div>
+                
+                <h3 className={`text-sm font-bold mb-2 flex items-center gap-1
+                  ${isHangoverMode ? 'text-emerald-800' : 'text-blue-800'}`}
+                >
+                  <Lightbulb className={`w-4 h-4 ${isHangoverMode ? 'text-emerald-500' : 'text-blue-500'}`} />
+                  アドバイス
+                </h3>
+                <div className={`text-sm leading-relaxed whitespace-pre-wrap font-medium
+                  ${isHangoverMode ? 'text-slate-700' : 'text-blue-900'}`}
+                >
+                  {data.result_summary}
                 </div>
               </div>
-            )}
-
-            <button className="w-full flex items-center justify-center gap-2 py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-black transition-colors">
-              <ShoppingCart className="w-5 h-5" />
-              詳細・購入を検討
-            </button>
+            </div>
           </div>
-        ))}
-      </div>
 
-      <div className="mt-10 p-6 bg-orange-50 rounded-3xl border border-orange-100 text-center">
-        <h4 className="font-bold text-gray-800 mb-3 flex items-center justify-center gap-2">
-          <Save className="w-5 h-5 text-primary" />
-          結果を記録に残しませんか？
-        </h4>
-        <p className="text-sm text-gray-600 mb-5">
-          保存すると、過去のコンディションと対策をいつでもマイページから振り返ることができます。
-        </p>
-        <button
-          onClick={handleSaveResult}
-          disabled={isSaved} // 保存済みならボタンを無効化
-          className={`w-full py-4 bg-white border-2 rounded-full font-bold transition-all shadow-sm flex justify-center items-center gap-2
-            ${isSaved 
-              ? 'border-gray-300 text-gray-400 cursor-not-allowed bg-gray-50' 
-              : 'border-primary text-primary hover:bg-primary hover:text-white'}`}
-        >
-          {isSaved ? '保存済み' : (isLoggedIn ? '診断結果を保存する' : '会員登録して結果を保存')}
-        </button>
-      </div>
+          {renderSaveSection(false)}
+          {renderActionButtons(false)}
 
-      <div className="mt-10 flex flex-col gap-4">
-        <Link 
-          to="/timing" 
-          className="flex items-center justify-center gap-2 text-gray-600 font-bold py-4 hover:text-primary transition-colors"
-        >
-          <RefreshCcw className="w-5 h-5" />
-          もう一度診断する
-        </Link>
-        <Link 
-          to="/" 
-          className="bg-white border-2 border-gray-200 text-center py-4 rounded-full font-bold hover:border-primary transition-all"
-        >
-          トップに戻る
-        </Link>
+        </div>
+
+        {/* =========================================
+            右カラム：薬の提案カードリスト
+        ========================================= */}
+        <div className="w-full lg:w-2/3 space-y-6">
+          {data.suggested_drugs.map((drug, index) => {
+            const isBestMatch = index === 0;
+            const isExpanded = isBestMatch || expandedCards.includes(index);
+            const isMedicine = String(drug.category) === 'medicine' || drug.category === 0;
+
+            const mapQuery = isMedicine ? '薬局' : 'コンビニ';
+            const amazonUrl = `https://www.amazon.co.jp/s?k=${encodeURIComponent(drug.name)}`;
+
+            return (
+              <div 
+                key={drug.id} 
+                // 💡 バッジが綺麗に収まる元のデザイン（overflow-hidden と pt-16 を維持）
+                className={`bg-white transition-all duration-300 overflow-hidden relative animate-fadeSlideInUp
+                  ${isBestMatch 
+                    ? `rounded-[2.5rem] border-4 pt-16 px-6 md:px-8 pb-8 ${
+                        isHangoverMode ? 'border-cyan-100 shadow-xl shadow-cyan-100/50' : 'border-orange-100 shadow-xl shadow-orange-100/50'
+                      }` 
+                    : 'rounded-3xl border border-gray-200 shadow-sm hover:shadow-md'
+                  }`}
+                style={{ animationDelay: `${DELAY_STEP * (3 + index)}ms` }}
+              >
+                {isBestMatch && (
+                  <div className="absolute top-6 left-0 w-full flex justify-center z-50">
+                    <div className={`text-white text-sm font-extrabold px-7 py-2 rounded-full tracking-tight shadow-xl animate-bounce-subtle flex items-center gap-1.5 ${
+                      isHangoverMode ? 'bg-gradient-to-r from-blue-400 to-cyan-500 shadow-cyan-500/30' : 'bg-gradient-to-r from-orange-600 to-red-600 shadow-orange-500/30'
+                    }`}>
+                      {isHangoverMode ? <Droplet className="w-4 h-4 text-white" /> : <Sparkles className="w-4 h-4 text-white" />}
+                      BEST MATCH
+                    </div>
+                  </div>
+                )}
+                
+                <div 
+                  onClick={() => toggleCard(index)}
+                  className={`flex justify-between items-center ${!isBestMatch && 'p-6 cursor-pointer hover:bg-gray-50'}`}
+                >
+                  <div>
+                    <h3 className={`${isBestMatch ? 'text-2xl' : 'text-lg'} font-bold text-gray-800`}>
+                      {drug.name}
+                    </h3>
+                    <span className={`text-xs font-bold px-2.5 py-1 rounded-md mt-2 inline-block
+                      ${isMedicine ? 'bg-blue-50 text-blue-600' : 'bg-green-50 text-green-600'}
+                    `}>
+                      {isMedicine ? 'ドラッグストア等(医薬品)' : 'コンビニ等(食品・部外品)'}
+                    </span>
+                  </div>
+
+                  {!isBestMatch && (
+                    <div className="bg-gray-100 p-2 rounded-full text-gray-500">
+                      {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                    </div>
+                  )}
+                </div>
+
+                <div className={`transition-all duration-500 ease-in-out ${isExpanded ? 'max-h-[1000px] opacity-100 mt-6' : 'max-h-0 opacity-0 m-0'}`}>
+                  <div className={`${!isBestMatch && 'px-6 pb-6'}`}>
+                    
+                    <p className="text-gray-600 text-sm leading-relaxed mb-6 font-medium">
+                      {drug.description}
+                    </p>
+
+                    {drug.pharmacist_advice && (
+                      // 💡 カード内ワンポイント：翌朝はエメラルド、通常はオレンジ
+                      <div className={`p-5 rounded-2xl mb-6 flex items-start gap-3 border ${
+                        isHangoverMode ? 'bg-emerald-50/50 border-emerald-100/50' : 'bg-orange-50/50 border-orange-100/50'
+                      }`}>
+                        <Lightbulb className={`w-5 h-5 flex-shrink-0 mt-0.5 ${isHangoverMode ? 'text-emerald-500' : 'text-primary'}`} />
+                        <div>
+                          <span className={`text-xs font-bold block mb-1 ${isHangoverMode ? 'text-emerald-600' : 'text-primary'}`}>
+                            薬剤師のワンポイント
+                          </span>
+                          <p className="text-sm text-slate-700 leading-relaxed font-medium">
+                            {drug.pharmacist_advice}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="flex flex-col gap-3 mt-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <a 
+                          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`}
+                          target="_blank" rel="noopener noreferrer"
+                          className={`flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold transition-colors ${
+                            isMedicine 
+                              ? 'bg-blue-50 text-blue-600 hover:bg-blue-100' 
+                              : 'bg-green-50 text-green-700 hover:bg-green-100'
+                          }`}
+                        >
+                          <MapPin className="w-5 h-5" />
+                          近くの{mapQuery}を探す
+                        </a>
+                        <a 
+                          href={amazonUrl}
+                          target="_blank" rel="noopener noreferrer"
+                          className="flex items-center justify-center gap-2 py-3.5 bg-gray-900 text-white rounded-xl font-bold hover:bg-black transition-colors"
+                        >
+                          <ShoppingCart className="w-5 h-5" />
+                          Amazonで探す <ExternalLink className="w-4 h-4 ml-1 opacity-50" />
+                        </a>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+
+          {renderSaveSection(true)}
+          {renderActionButtons(true)}
+
+        </div>
       </div>
     </div>
   );
@@ -1964,6 +2567,31 @@ export interface DiagnosisLog {
 @theme {
   --color-primary: #FF8C00;
 } ```
+
+## File: ./Dockerfile
+ ```/Dockerfile
+FROM ruby:3.3.0
+
+RUN apt-get update -qq && apt-get install -y build-essential libpq-dev nodejs postgresql-client
+
+WORKDIR /app
+
+# 環境変数の設定 (本番モード)
+ENV RAILS_ENV="production" \
+    RAILS_SERVE_STATIC_FILES="true" \
+    RAILS_LOG_TO_STDOUT="true"
+
+COPY Gemfile Gemfile.lock /app/
+RUN bundle config set --local without 'development test' && bundle install
+
+COPY . /app
+
+# bin配下の実行権限を付与
+RUN chmod +x /app/bin/*
+
+# サーバー起動設定
+CMD ["bundle", "exec", "rails", "s", "-p", "3000", "-b", "0.0.0.0"]
+ ```
 
 ## File: ./config/initializers/inflections.rb
  ```rb
@@ -2740,6 +3368,39 @@ ENV["BUNDLE_GEMFILE"] ||= File.expand_path("../Gemfile", __dir__)
 require "bundler/setup" # Set up gems listed in the Gemfile.
 require "bootsnap/setup" # Speed up boot time by caching expensive operations.
  ```
+
+## File: ./docker-compose.yml
+ ```yml
+services:
+  db:
+    image: postgres:16
+    volumes:
+      - ./tmp/db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_HOST_AUTH_METHOD: trust
+  web:
+    build: .
+    command: bundle exec rails s -p 3000 -b '0.0.0.0'
+    volumes:
+      - .:/app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    environment:
+      RAILS_ENV: development
+      DATABASE_URL: postgres://postgres:password@db:5432/app_development
+  frontend:
+    image: node:20-slim
+    volumes:
+      - ./frontend:/app
+    working_dir: /app
+    ports:
+      - "5173:5173"
+    command: npm run dev
+    tty: true
+    stdin_open: true ```
 
 ## File: ./Gemfile
  ```/Gemfile
