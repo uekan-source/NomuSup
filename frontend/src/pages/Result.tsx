@@ -5,7 +5,7 @@ import client from '../api/client';
 import type { Drug } from '../types';
 import { 
   Sparkles, ShoppingCart, RefreshCcw, Save, Lightbulb, 
-  MapPin, ExternalLink, ChevronDown, ChevronUp, UserCircle
+  MapPin, ExternalLink, ChevronDown, ChevronUp, UserCircle, Droplet
 } from 'lucide-react';
 import DiagnosisHeader from '../components/shared/DiagnosisHeader';
 
@@ -45,6 +45,8 @@ const Result = () => {
   const [expandedCards, setExpandedCards] = useState<number[]>([]);
   
   const data = location.state?.result as DiagnosisResponse;
+
+  const isHangoverMode = data?.timing === 2;
 
   const headerSteps = data?.timing === 0
     ? [{ id: 1, label: '予定' }, { id: 2, label: '気分' }, { id: 3, label: '体質' }, { id: 4, label: '結果' }]
@@ -90,14 +92,15 @@ const Result = () => {
 
   const DELAY_STEP = 500;
 
-  // 💡 【追加】「記録に残す」セクションを共通化（スマホ用/PC用で出し分けるため）
   const renderSaveSection = (isMobile: boolean) => (
     <div 
-      className={`animate-fadeSlideInUp p-6 bg-gradient-to-br from-orange-50 to-white rounded-3xl border border-orange-100 shadow-sm text-center ${isMobile ? 'block lg:hidden mt-10' : 'hidden lg:block'}`}
+      className={`animate-fadeSlideInUp p-6 rounded-3xl border shadow-sm text-center transition-colors duration-500
+        ${isMobile ? 'block lg:hidden mt-10' : 'hidden lg:block'}
+        ${isHangoverMode ? 'bg-gradient-to-br from-blue-50 to-white border-blue-100' : 'bg-gradient-to-br from-orange-50 to-white border-orange-100'}`}
       style={{ animationDelay: `${DELAY_STEP * (3 + data.suggested_drugs.length)}ms` }}
     >
       <h4 className="font-bold text-gray-800 mb-2 flex items-center justify-center gap-1.5 text-md">
-        <Save className="w-4 h-4 text-primary" />
+        <Save className={`w-4 h-4 ${isHangoverMode ? 'text-cyan-500' : 'text-primary'}`} />
         記録に残しませんか？
       </h4>
       <p className="text-xs text-gray-500 mb-4 leading-relaxed">
@@ -109,14 +112,15 @@ const Result = () => {
         className={`w-full py-3.5 bg-white border-2 rounded-full font-bold text-sm transition-all shadow-sm flex justify-center items-center gap-2
           ${isSaved 
             ? 'border-gray-200 text-gray-400 cursor-not-allowed bg-gray-50' 
-            : 'border-primary text-primary hover:bg-primary hover:text-white hover:shadow-md'}`}
+            : (isHangoverMode 
+                ? 'border-cyan-500 text-cyan-600 hover:bg-cyan-500 hover:text-white hover:shadow-md'
+                : 'border-primary text-primary hover:bg-primary hover:text-white hover:shadow-md')}`}
       >
         {isSaved ? '保存済み' : (isLoggedIn ? '結果を保存する' : '会員登録して保存')}
       </button>
     </div>
   );
 
-  // 💡 【追加】「戻る」ボタン群を共通化
   const renderActionButtons = (isMobile: boolean) => (
     <div 
       className={`animate-fadeSlideInUp flex-col gap-3 relative z-10 ${isMobile ? 'flex lg:hidden mt-6' : 'hidden lg:flex'}`}
@@ -124,14 +128,16 @@ const Result = () => {
     >
       <Link 
         to="/diagnosis?timing=0" 
-        className="flex items-center justify-center gap-2 text-gray-600 text-sm font-bold py-3.5 hover:text-primary transition-colors bg-white rounded-full border-2 border-transparent"
+        className={`flex items-center justify-center gap-2 text-gray-600 text-sm font-bold py-3.5 transition-colors bg-white rounded-full border-2 border-transparent
+          ${isHangoverMode ? 'hover:text-cyan-600' : 'hover:text-primary'}`}
       >
         <RefreshCcw className="w-4 h-4" />
         もう一度診断する
       </Link>
       <Link 
         to="/" 
-        className="bg-white border-2 border-gray-200 text-center text-sm py-3.5 rounded-full font-bold text-gray-600 hover:border-primary hover:text-primary transition-all"
+        className={`bg-white border-2 border-gray-200 text-center text-sm py-3.5 rounded-full font-bold text-gray-600 transition-all
+          ${isHangoverMode ? 'hover:border-cyan-500 hover:text-cyan-600' : 'hover:border-primary hover:text-primary'}`}
       >
         トップに戻る
       </Link>
@@ -139,62 +145,87 @@ const Result = () => {
   );
 
   return (
-    <div className="max-w-5xl mx-auto pt-6 pb-20 px-6 relative bg-white min-h-screen">
+    <div className={`max-w-5xl mx-auto pt-6 pb-20 px-6 relative min-h-screen transition-colors duration-500 ${
+      isHangoverMode ? 'bg-gradient-to-br from-blue-50/80 via-white to-cyan-50/80' : 'bg-white'
+    }`}>
       <style>{customStyles}</style>
       
       {/* 1. Header */}
       <div className="animate-fadeSlideInUp max-w-2xl mx-auto" style={{ animationDelay: '0ms' }}>
-        <DiagnosisHeader currentStep={4} steps={headerSteps} />
+        <DiagnosisHeader currentStep={4} steps={headerSteps} theme={isHangoverMode ? 'blue' : 'orange'} />
       </div>
 
       {/* 2. Title */}
       <div className="text-center mb-12 relative z-10 animate-fadeSlideInUp" style={{ animationDelay: `${DELAY_STEP * 1}ms` }}>
-        <div className="inline-block bg-gradient-to-br from-orange-400 to-primary p-3 rounded-full mb-4 shadow-lg shadow-orange-200">
-          <Sparkles className="text-white w-8 h-8" />
+        <div className={`inline-block p-3 rounded-full mb-4 shadow-lg ${
+          isHangoverMode ? 'bg-gradient-to-br from-blue-400 to-cyan-500 shadow-cyan-200' : 'bg-gradient-to-br from-orange-400 to-primary shadow-orange-200'
+        }`}>
+          {isHangoverMode ? <Droplet className="text-white w-8 h-8" /> : <Sparkles className="text-white w-8 h-8" />}
         </div>
-        <h2 className="text-3xl lg:text-4xl font-extrabold mb-3 text-gray-800 tracking-tight">あなたへの処方箋</h2>
-        <p className="text-orange-600/80 font-medium text-sm lg:text-base">ソムリエが最適な対策をセレクトしました</p>
+        <h2 className={`text-3xl lg:text-4xl font-extrabold mb-3 tracking-tight ${isHangoverMode ? 'text-blue-900' : 'text-gray-800'}`}>
+          あなたへの処方箋
+        </h2>
+        <p className={`font-medium text-sm lg:text-base ${isHangoverMode ? 'text-blue-600/80' : 'text-orange-600/80'}`}>
+          ソムリエが最適な対策をセレクトしました
+        </p>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-10 items-start">
         
         {/* =========================================
-            左カラム：チャット風アドバイス ＆ (PC用)ボタン群
+            左カラム：チャット風アドバイス
         ========================================= */}
         <div className="w-full lg:w-1/3 lg:sticky lg:top-24 space-y-8">
           
-          {/* 3. Pharmacist Advice (チャット風UI) */}
           <div className="animate-fadeSlideInUp" style={{ animationDelay: `${DELAY_STEP * 2}ms` }}>
             <div className="flex gap-4 items-start">
+              
+              {/* 💡 薬剤師アバター：翌朝はエメラルド、通常はブルー */}
               <div className="flex flex-col items-center gap-1 flex-shrink-0">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center shadow-md">
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center shadow-md
+                  ${isHangoverMode 
+                    ? 'bg-gradient-to-br from-emerald-400 to-emerald-600' 
+                    : 'bg-gradient-to-br from-blue-400 to-blue-600'}`}
+                >
                   <UserCircle className="text-white w-8 h-8" />
                 </div>
-                <span className="text-[10px] font-bold text-blue-600">薬剤師</span>
+                <span className={`text-[10px] font-bold ${isHangoverMode ? 'text-emerald-600' : 'text-blue-600'}`}>
+                  薬剤師
+                </span>
               </div>
 
-              <div className="relative bg-gradient-to-br from-blue-50 to-white p-5 rounded-2xl rounded-tl-none border border-blue-100 shadow-sm flex-grow">
-                <div className="absolute top-0 -left-2 w-0 h-0 border-t-[0px] border-t-transparent border-r-[10px] border-r-blue-50 border-b-[12px] border-b-transparent"></div>
+              {/* 💡 吹き出し：翌朝はエメラルド、通常はブルー */}
+              <div className={`relative p-5 rounded-2xl rounded-tl-none border shadow-sm flex-grow
+                ${isHangoverMode 
+                  ? 'bg-gradient-to-br from-emerald-50 to-white border-emerald-100' 
+                  : 'bg-gradient-to-br from-blue-50 to-white border-blue-100'}`}
+              >
+                <div className={`absolute top-0 -left-2 w-0 h-0 border-t-[0px] border-t-transparent border-r-[10px] border-b-[12px] border-b-transparent
+                  ${isHangoverMode ? 'border-r-emerald-50' : 'border-r-blue-50'}`}
+                ></div>
                 
-                <h3 className="text-sm font-bold text-blue-800 mb-2 flex items-center gap-1">
-                  <Lightbulb className="w-4 h-4 text-blue-500" />
+                <h3 className={`text-sm font-bold mb-2 flex items-center gap-1
+                  ${isHangoverMode ? 'text-emerald-800' : 'text-blue-800'}`}
+                >
+                  <Lightbulb className={`w-4 h-4 ${isHangoverMode ? 'text-emerald-500' : 'text-blue-500'}`} />
                   アドバイス
                 </h3>
-                <div className="text-blue-900 text-sm leading-relaxed whitespace-pre-wrap font-medium">
+                <div className={`text-sm leading-relaxed whitespace-pre-wrap font-medium
+                  ${isHangoverMode ? 'text-slate-700' : 'text-blue-900'}`}
+                >
                   {data.result_summary}
                 </div>
               </div>
             </div>
           </div>
 
-          {/* 💡 PCの時だけ表示されるボタン群（isMobile = false） */}
           {renderSaveSection(false)}
           {renderActionButtons(false)}
 
         </div>
 
         {/* =========================================
-            右カラム：薬の提案カードリスト ＆ (スマホ用)ボタン群
+            右カラム：薬の提案カードリスト
         ========================================= */}
         <div className="w-full lg:w-2/3 space-y-6">
           {data.suggested_drugs.map((drug, index) => {
@@ -208,17 +239,22 @@ const Result = () => {
             return (
               <div 
                 key={drug.id} 
+                // 💡 バッジが綺麗に収まる元のデザイン（overflow-hidden と pt-16 を維持）
                 className={`bg-white transition-all duration-300 overflow-hidden relative animate-fadeSlideInUp
                   ${isBestMatch 
-                    ? 'rounded-[2.5rem] border-4 border-orange-100 shadow-xl shadow-orange-100/50 pt-16 px-6 md:px-8 pb-8' 
-                    : 'rounded-3xl border border-gray-200 shadow-sm'
+                    ? `rounded-[2.5rem] border-4 pt-16 px-6 md:px-8 pb-8 ${
+                        isHangoverMode ? 'border-cyan-100 shadow-xl shadow-cyan-100/50' : 'border-orange-100 shadow-xl shadow-orange-100/50'
+                      }` 
+                    : 'rounded-3xl border border-gray-200 shadow-sm hover:shadow-md'
                   }`}
                 style={{ animationDelay: `${DELAY_STEP * (3 + index)}ms` }}
               >
                 {isBestMatch && (
                   <div className="absolute top-6 left-0 w-full flex justify-center z-50">
-                    <div className="bg-gradient-to-r from-orange-600 to-red-600 text-white text-sm font-extrabold px-7 py-2 rounded-full tracking-tight shadow-xl shadow-orange-500/30 animate-bounce-subtle flex items-center gap-1.5">
-                      <Sparkles className="w-4 h-4 text-white" />
+                    <div className={`text-white text-sm font-extrabold px-7 py-2 rounded-full tracking-tight shadow-xl animate-bounce-subtle flex items-center gap-1.5 ${
+                      isHangoverMode ? 'bg-gradient-to-r from-blue-400 to-cyan-500 shadow-cyan-500/30' : 'bg-gradient-to-r from-orange-600 to-red-600 shadow-orange-500/30'
+                    }`}>
+                      {isHangoverMode ? <Droplet className="w-4 h-4 text-white" /> : <Sparkles className="w-4 h-4 text-white" />}
                       BEST MATCH
                     </div>
                   </div>
@@ -254,11 +290,16 @@ const Result = () => {
                     </p>
 
                     {drug.pharmacist_advice && (
-                      <div className="bg-orange-50/50 p-5 rounded-2xl mb-6 flex items-start gap-3 border border-orange-100/50">
-                        <Lightbulb className="text-primary w-5 h-5 flex-shrink-0 mt-0.5" />
+                      // 💡 カード内ワンポイント：翌朝はエメラルド、通常はオレンジ
+                      <div className={`p-5 rounded-2xl mb-6 flex items-start gap-3 border ${
+                        isHangoverMode ? 'bg-emerald-50/50 border-emerald-100/50' : 'bg-orange-50/50 border-orange-100/50'
+                      }`}>
+                        <Lightbulb className={`w-5 h-5 flex-shrink-0 mt-0.5 ${isHangoverMode ? 'text-emerald-500' : 'text-primary'}`} />
                         <div>
-                          <span className="text-xs font-bold text-primary block mb-1">薬剤師のワンポイント</span>
-                          <p className="text-sm text-gray-700 leading-relaxed font-medium">
+                          <span className={`text-xs font-bold block mb-1 ${isHangoverMode ? 'text-emerald-600' : 'text-primary'}`}>
+                            薬剤師のワンポイント
+                          </span>
+                          <p className="text-sm text-slate-700 leading-relaxed font-medium">
                             {drug.pharmacist_advice}
                           </p>
                         </div>
@@ -296,7 +337,6 @@ const Result = () => {
             );
           })}
 
-          {/* 💡 スマホの時だけ表示されるボタン群（isMobile = true） */}
           {renderSaveSection(true)}
           {renderActionButtons(true)}
 
