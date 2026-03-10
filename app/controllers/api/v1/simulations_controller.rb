@@ -15,7 +15,7 @@ module Api
           constitution: constitution,
           drinks: drinks
         )
-        
+
         result = service.execute
 
         render json: {
