@@ -19,7 +19,6 @@ module Api
         end
 
         # PUT /api/v1/auth/password (新パスワード設定)
-        # rubocop:disable Metrics/AbcSize
         def update
           update_params = params.require(:user).permit(:reset_password_token, :password, :password_confirmation)
           self.resource = resource_class.reset_password_by_token(update_params)
