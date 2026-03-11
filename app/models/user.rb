@@ -19,7 +19,7 @@ class User < ApplicationRecord
       user.email = auth.info.email
       # Googleログインの場合、パスワードはGoogleが担保するのでランダムな文字列を設定
       user.password = Devise.friendly_token[0, 20]
-      user.name = auth.info.name || "ユーザー"
+      user.name = auth.info.name || 'ユーザー'
     end
   end
 end
