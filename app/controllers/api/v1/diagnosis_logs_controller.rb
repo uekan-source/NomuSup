@@ -48,7 +48,6 @@ module Api
         render json: { error: '履歴が見つかりませんでした' }, status: :not_found
       end
 
-      # rubocop:disable Metrics/AbcSize
       def create
         symptom_ids = params[:symptom_ids]
         timing = params[:timing]

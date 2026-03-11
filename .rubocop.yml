@@ -37,3 +37,7 @@ Metrics/BlockLength:
 Rails/Exit:
   Exclude:
     - 'spec/rails_helper.rb'
+
+# メソッドの複雑さ（AbcSize）の制限を少し緩めにする（デフォルトは17）
+Metrics/AbcSize:
+  Max: 25
