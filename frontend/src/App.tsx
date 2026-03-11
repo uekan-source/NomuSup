@@ -16,6 +16,7 @@ import { TermsOfService, PrivacyPolicy, Disclaimer } from './pages/StaticPages';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import Simulation from './pages/Simulation';
+import OAuthCallback from './pages/OAuthCallback';
 
 const App = () => {
   return (
@@ -41,6 +42,7 @@ const App = () => {
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/simulation" element={<Simulation />} />
+              <Route path="/oauth/callback" element={<OAuthCallback />} />
             </Routes>
           </main>
           <Footer />

@@ -24,7 +24,8 @@ Rails.application.routes.draw do
       # DeviseのルートをAPIのパス配下に設定
       devise_for :users, skip: [:sessions, :registrations, :passwords], controllers: {
         sessions: 'api/v1/auth/sessions',
-        registrations: 'api/v1/auth/registrations'
+        registrations: 'api/v1/auth/registrations',
+        omniauth_callbacks: 'api/v1/auth/omniauth_callbacks'
       }
 
       # パスを /api/v1/auth/signup などに明示的にマッピング

@@ -54,3 +54,12 @@ end
 gem 'devise'
 
 gem 'devise-jwt'
+
+# OAuth連携用の基本ライブラリ
+gem 'omniauth'
+# 各サービス（プロバイダ）専用の通信ライブラリ
+gem 'omniauth-google-oauth2'
+gem 'omniauth-twitter'
+gem 'omniauth-github'
+# Rails APIモードでOmniAuthを使うためのセキュリティ対策
+gem 'omniauth-rails_csrf_protection'
