@@ -75,6 +75,31 @@ const handleSubmit = async (e: React.FormEvent) => {
         </button>
       </form>
 
+      <div className="mt-8">
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-200"></div>
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-4 bg-white text-gray-500 font-medium">または</span>
+          </div>
+        </div>
+
+        <div className="mt-6">
+          <a
+            href="http://localhost:3000/api/v1/users/auth/google_oauth2"
+            className="w-full flex items-center justify-center py-4 px-4 border border-gray-300 rounded-full shadow-sm bg-white text-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors"
+          >
+            <img
+              className="h-5 w-5 mr-3"
+              src="https://www.svgrepo.com/show/475656/google-color.svg"
+              alt="Googleロゴ"
+            />
+            Googleでログイン
+          </a>
+        </div>
+      </div>
+
       <div className="mt-6 text-center">
         <Link to="/forgot-password" className="text-sm text-primary font-bold hover:underline">
           パスワードを忘れた方はこちら
