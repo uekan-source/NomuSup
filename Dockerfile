@@ -18,4 +18,5 @@ COPY . /app
 RUN chmod +x /app/bin/*
 
 # サーバー起動設定
-CMD ["bundle", "exec", "rails", "s", "-p", "3000", "-b", "0.0.0.0"]
+# サーバー起動設定（マイグレーションをしてから起動する）
+CMD bash -c "bundle exec rails db:migrate && bundle exec rails s -p 3000 -b 0.0.0.0"
