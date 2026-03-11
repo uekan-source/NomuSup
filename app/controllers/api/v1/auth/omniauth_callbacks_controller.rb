@@ -7,6 +7,14 @@ module Api
           handle_auth
         end
 
+        def github
+          handle_auth
+        end
+
+        def twitter
+          handle_auth
+        end
+
         private
 
         def handle_auth
@@ -20,11 +28,14 @@ module Api
             # ログイン成功：JWTトークンを発行（既存のログインと同じ処理）
             token, _payload = Warden::JWTAuth::UserEncoder.new.call(user, :user, nil)
 
-            # 【重要】React側の特定のURL（後で作ります）へ、トークンをくっつけてリダイレクト！
-            redirect_to "http://localhost:5173/oauth/callback?token=#{token}", allow_other_host: true
+           # ▼ 環境変数からフロントエンドのURLを取得（設定されていなければlocalhostを使う）
+            frontend_url = ENV['FRONTEND_URL'] || 'http://localhost:5173'
+            
+            # 【重要】React側の特定のURLへ、トークンをくっつけてリダイレクト！
+            redirect_to "#{frontend_url}/oauth/callback?token=#{token}", allow_other_host: true
           else
             # 失敗した場合：Reactのログイン画面にエラーパラメータをつけてリダイレクト
-            redirect_to 'http://localhost:5173/login?error=oauth_failed', allow_other_host: true
+            redirect_to "#{frontend_url}/login?error=oauth_failed", allow_other_host: true
           end
         end
       end

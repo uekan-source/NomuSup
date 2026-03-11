@@ -5,7 +5,8 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :validatable,
          :jwt_authenticatable, :omniauthable,
-         jwt_revocation_strategy: self, omniauth_providers: [:google_oauth2]
+         jwt_revocation_strategy: self, 
+         omniauth_providers: [:google_oauth2, :github, :twitter]
 
   has_many :diagnosis_logs, dependent: :destroy
 
