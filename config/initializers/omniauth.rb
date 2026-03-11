@@ -15,6 +15,12 @@ Rails.application.config.middleware.use OmniAuth::Builder do
     image_size: 50
   }
 
+  # GitHubの設定（メアド取得の権限をリクエスト）
+  provider :github, ENV['GITHUB_CLIENT_ID'], ENV['GITHUB_CLIENT_SECRET'], scope: 'user:email'
+  
+  # X(Twitter)の設定
+  provider :twitter, ENV['TWITTER_API_KEY'], ENV['TWITTER_API_SECRET']
+
   # X(Twitter)やGitHubの設定も、後からここに数行足すだけでOKです！
   # provider :github, ENV['GITHUB_CLIENT_ID'], ENV['GITHUB_CLIENT_SECRET']
 end

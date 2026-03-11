@@ -16,9 +16,11 @@ class User < ApplicationRecord
 
   # OmniAuthのデータからユーザーを探す、または作るメソッド
   def self.from_omniauth(auth)
-    where(provider: auth.provider, uid: auth.uid).first_or_create do |user|
-      user.email = auth.info.email
-      # Googleログインの場合、パスワードはGoogleが担保するのでランダムな文字列を設定
+    provider_email = auth.info.email || "#{auth.uid}-#{auth.provider}@example.com"
+    # ▼ 検索の軸を provider から email に変更するだけ！
+    where(email: provider_email).first_or_create do |user|
+      user.provider = auth.provider
+      user.uid = auth.uid
       user.password = Devise.friendly_token[0, 20]
       user.name = auth.info.name || 'ユーザー'
     end

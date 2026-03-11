@@ -24,13 +24,11 @@ module Api
           # 先ほどUserモデルに書いたメソッドでユーザーを検索・作成
           user = User.from_omniauth(auth)
 
+          frontend_url = ENV['FRONTEND_URL'].presence || 'http://localhost:5173'
+
           if user.persisted?
             # ログイン成功：JWTトークンを発行（既存のログインと同じ処理）
             token, _payload = Warden::JWTAuth::UserEncoder.new.call(user, :user, nil)
-
-            # ▼ 環境変数からフロントエンドのURLを取得（設定されていなければlocalhostを使う）
-            frontend_url = ENV['FRONTEND_URL'] || 'http://localhost:5173'
-
             # 【重要】React側の特定のURLへ、トークンをくっつけてリダイレクト！
             redirect_to "#{frontend_url}/oauth/callback?token=#{token}", allow_other_host: true
           else
