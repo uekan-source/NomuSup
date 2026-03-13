@@ -3,7 +3,15 @@ module Api
     class UsersController < ApplicationController
       def show
         if current_user
-          render json: { id: current_user.id, name: current_user.name, email: current_user.email }, status: :ok
+          # 💡 返却するJSONに weight, gender, constitution を追加
+          render json: { 
+            id: current_user.id, 
+            name: current_user.name, 
+            email: current_user.email,
+            weight: current_user.weight,
+            gender: current_user.gender,
+            constitution: current_user.constitution
+          }, status: :ok
         else
           render json: { error: 'ユーザーが見つかりません' }, status: :unauthorized
         end
@@ -20,7 +28,8 @@ module Api
       private
 
       def user_params
-        params.require(:user).permit(:name, :email)
+        # 💡 permitの許可リストに weight, gender, constitution を追加
+        params.require(:user).permit(:name, :email, :weight, :gender, :constitution)
       end
     end
   end

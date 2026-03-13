@@ -17,17 +17,22 @@ const Diagnosis = () => {
 
   const isHangoverMode = timing === '2';
 
+  // 💡 category: 2 (気分・予定) 用のstateを追加
+  const [moods, setMoods] = useState<Symptom[]>([]);
   const [symptoms, setSymptoms] = useState<Symptom[]>([]);
   const [constitutions, setConstitutions] = useState<Symptom[]>([]);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const [wizardStep, setWizardStep] = useState<1 | 2 | 3>(1);
+  // 💡 timing=2の時は、入力ステップを2つ（気分・症状）で終了させる
+  const maxStep = isHangoverMode ? 2 : 3;
+  const [wizardStep, setWizardStep] = useState<number>(1);
 
   useEffect(() => {
     const fetchSymptoms = async () => {
       try {
         const response = await client.get(`/symptoms?timing=${timing}`);
+        setMoods(response.data.moods);                 // 💡 追加
         setSymptoms(response.data.symptoms);
         setConstitutions(response.data.constitutions);
       } catch (error) {
@@ -57,22 +62,32 @@ const Diagnosis = () => {
     }
   };
 
+  // 💡 複雑なフィルター処理がなくなり、APIのデータをそのまま渡すだけに！
   const getStepData = () => {
     if (timing === '0') {
       return {
-        header: [{ id: 1, label: '予定' }, { id: 2, label: '気分' }, { id: 3, label: '体質' }, { id: 4, label: '結果' }],
-        step1: symptoms.filter(s => s.name.includes('予定') || s.name.includes('炭酸')),
-        step2: symptoms.filter(s => s.name.includes('空腹')),
+        header: [{ id: 1, label: '予定' }, { id: 2, label: '症状' }, { id: 3, label: '体質' }, { id: 4, label: '結果' }],
+        step1: moods,
+        step2: symptoms,
         step3: constitutions,
-        title1: '今日の予定は？', title2: '今の気分・状況は？', title3: 'あなたの体質は？'
+        title1: '今日の予定は？', title2: '今の状況・コンディションは？', title3: 'あなたの体質は？'
       };
-    } else {
+    } else if (timing === '1') {
       return {
         header: [{ id: 1, label: '気分' }, { id: 2, label: '症状' }, { id: 3, label: '体質' }, { id: 4, label: '結果' }],
-        step1: symptoms.filter(s => s.name.includes('欲求') || s.name.includes('だるい')),
-        step2: symptoms.filter(s => !s.name.includes('欲求') && !s.name.includes('だるい')),
+        step1: moods,
+        step2: symptoms,
         step3: constitutions,
         title1: '今の気分は？', title2: '具体的な症状は？', title3: 'あなたの体質は？'
+      };
+    } else {
+      // 💡 翌朝 (timing=2) は体質を省略し、全3ステップに変更
+      return {
+        header: [{ id: 1, label: '気分' }, { id: 2, label: '症状' }, { id: 3, label: '結果' }],
+        step1: moods,
+        step2: symptoms,
+        step3: [], // 使用しない
+        title1: '今の気分は？', title2: '具体的な症状は？', title3: ''
       };
     }
   };
@@ -82,25 +97,24 @@ const Diagnosis = () => {
   const currentTitle = wizardStep === 1 ? currentConfig.title1 : wizardStep === 2 ? currentConfig.title2 : currentConfig.title3;
 
   const getIconForText = (text: string, isSelected: boolean) => {
-    // 💡 翌朝モードの基本カラーを「水色（cyan）」に
     const defaultColor = isHangoverMode ? 'text-cyan-500' : 'text-primary';
     const iconClass = `w-7 h-7 flex-shrink-0 transition-colors duration-300 ${isSelected ? 'text-white' : defaultColor}`;
     
+    // キーワードによるアイコン出し分けはそのまま維持
     if (text.includes('空腹')) return <Utensils className={iconClass} />;
     if (text.includes('予定')) return <Calendar className={iconClass} />;
-    if (text.includes('炭酸')) return <Beer className={iconClass} />;
+    if (text.includes('炭酸') || text.includes('お酒')) return <Beer className={iconClass} />;
     if (text.includes('弱い')) return <Activity className={iconClass} />;
-    if (text.includes('赤く')) return <ThermometerSun className={iconClass} />;
+    if (text.includes('赤く') || text.includes('熱い')) return <ThermometerSun className={iconClass} />;
     if (text.includes('ふらつく')) return <Wind className={iconClass} />;
-    if (text.includes('乾く')) return <Droplets className={iconClass} />;
-    if (text.includes('締め')) return <Soup className={iconClass} />;
-    if (text.includes('違和感')) return <AlertTriangle className={iconClass} />;
+    if (text.includes('渇く') || text.includes('水分')) return <Droplets className={iconClass} />;
+    if (text.includes('締め') || text.includes('食事')) return <Soup className={iconClass} />;
+    if (text.includes('違和感') || text.includes('残って')) return <AlertTriangle className={iconClass} />;
     if (text.includes('頭痛')) return <Brain className={iconClass} />;
-    if (text.includes('吐き気')) return <Frown className={iconClass} />;
-    if (text.includes('だるい')) return <BatteryWarning className={iconClass} />;
+    if (text.includes('吐き気') || text.includes('気分') || text.includes('後悔')) return <Frown className={iconClass} />;
+    if (text.includes('だるい') || text.includes('重い')) return <BatteryWarning className={iconClass} />;
     if (text.includes('むくみ')) return <CloudRain className={iconClass} />;
-    if (text.includes('胃痛')) return <HeartPulse className={iconClass} />;
-    // 翌朝は「水滴」アイコンで水分補給の清涼感を演出
+    if (text.includes('胃痛') || text.includes('もたれ') || text.includes('下痢')) return <HeartPulse className={iconClass} />;
     return isHangoverMode ? <Droplet className={iconClass} /> : <Sparkles className={iconClass} />;
   };
 
@@ -111,7 +125,6 @@ const Diagnosis = () => {
   );
 
   return (
-    // 💡 【変更】背景を「白ヘッダーに馴染む淡い水色のグラデーション」に
     <div className={`min-h-screen pt-6 pb-32 px-6 transition-colors duration-500 ${
       isHangoverMode 
         ? 'bg-gradient-to-br from-blue-50/80 via-white to-cyan-50/80' 
@@ -119,7 +132,6 @@ const Diagnosis = () => {
     }`}>
       <div className="max-w-xl mx-auto">
         
-        {/* 💡 ヘッダーにテーマカラーを渡す */}
         <DiagnosisHeader 
           currentStep={wizardStep} 
           steps={currentConfig.header} 
@@ -128,7 +140,6 @@ const Diagnosis = () => {
 
         <div className="animate-fadeIn">
           <div className="text-center mb-10">
-            {/* 💡 テキストカラーを「深い青」にして視認性と優しさを両立 */}
             <h2 className={`text-3xl font-bold mb-3 drop-shadow-sm transition-colors ${
               isHangoverMode ? 'text-blue-900' : 'text-gray-800'
             }`}>
@@ -151,7 +162,6 @@ const Diagnosis = () => {
                   <button 
                     key={item.id} 
                     onClick={() => toggleSymptom(item.id)} 
-                    // 💡 【変更】カードは白ベースで、選択時に淡い水色に光るように
                     className={`group flex items-center p-5 rounded-3xl border-2 text-left transition-all duration-300 w-full overflow-hidden relative
                       ${isHangoverMode 
                         ? (isSelected 
@@ -197,7 +207,7 @@ const Diagnosis = () => {
           </div>
         </div>
 
-        {/* --- Sticky（画面下部固定）ナビゲーションボタン --- */}
+        {/* --- Sticky ナビゲーションボタン --- */}
         <div className={`fixed bottom-0 left-0 w-full p-4 z-50 transition-colors duration-500 bg-white/80 backdrop-blur-xl border-t ${
           isHangoverMode ? 'border-blue-50 shadow-[0_-10px_30px_-15px_rgba(0,100,255,0.05)]' : 'border-gray-100 shadow-[0_-10px_30px_-15px_rgba(0,0,0,0.1)]'
         }`}>
@@ -205,7 +215,7 @@ const Diagnosis = () => {
             
             {wizardStep > 1 && (
               <button 
-                onClick={() => setWizardStep(prev => (prev - 1) as 1 | 2 | 3)} 
+                onClick={() => setWizardStep(prev => prev - 1)} 
                 className={`px-6 py-4 rounded-full font-bold transition-all whitespace-nowrap shadow-sm border-2 bg-white ${
                   isHangoverMode
                     ? 'text-blue-500 border-blue-100 hover:border-cyan-300 hover:bg-blue-50'
@@ -217,17 +227,18 @@ const Diagnosis = () => {
             )}
 
             <button 
-              onClick={wizardStep < 3 ? () => setWizardStep(prev => (prev + 1) as 1 | 2 | 3) : handleSubmit}
-              disabled={selectedIds.length === 0 && wizardStep === 3}
+              // 💡 3ではなく、maxStep (2 または 3) で判定するように変更
+              onClick={wizardStep < maxStep ? () => setWizardStep(prev => prev + 1) : handleSubmit}
+              disabled={selectedIds.length === 0 && wizardStep === maxStep}
               className={`flex-grow py-4 rounded-full text-lg font-bold transition-all flex items-center justify-center gap-2
-                ${selectedIds.length === 0 && wizardStep === 3
+                ${selectedIds.length === 0 && wizardStep === maxStep
                   ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-2 border-gray-200'
                   : (isHangoverMode
                       ? 'bg-gradient-to-r from-blue-400 to-cyan-500 text-white shadow-lg shadow-cyan-200/50 hover:shadow-xl hover:-translate-y-1'
                       : 'bg-gradient-to-r from-orange-500 to-primary text-white shadow-lg shadow-orange-300/50 hover:shadow-xl hover:-translate-y-1')
                 }`}
             >
-              {wizardStep < 3 ? (
+              {wizardStep < maxStep ? (
                 <>次へ進む（{selectedIds.length}件選択中） <ArrowRight className="w-5 h-5" /></>
               ) : selectedIds.length === 0 ? (
                 '1つ以上選択してください'
