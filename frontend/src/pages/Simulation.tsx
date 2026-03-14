@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import client from '../api/client';
+import { useAuth } from '../context/AuthContext';
 import { 
   Calculator, Scale, User, Activity, Beer, Wine, GlassWater, 
-  Trash2, Plus, AlertTriangle, Clock, ChevronLeft, Zap, Martini
+  Trash2, Plus, AlertTriangle, Clock, ChevronLeft, Zap, Martini, LogIn
 } from 'lucide-react';
 
 // APIからのレスポンスの型
@@ -22,7 +23,7 @@ interface DrinkRecord {
   abv: number;
 }
 
-// プリセットの定義（16種類に拡充）
+// プリセットの定義（18種類）
 const PRESETS = [
   // --- ビール・サワー系 ---
   { name: 'ビール(中ジョッキ)', volume: 500, abv: 5, icon: <Beer className="w-5 h-5" /> },
@@ -57,11 +58,12 @@ const PRESETS = [
 
 const Simulation = () => {
   const navigate = useNavigate();
+  const { user, isLoggedIn } = useAuth();
   
-  // ユーザーの基本情報（使い勝手向上のため、初期値はlocalStorageから取得）
-  const [weight, setWeight] = useState<string>(localStorage.getItem('sim_weight') || '60');
-  const [gender, setGender] = useState<string>(localStorage.getItem('sim_gender') || 'male');
-  const [constitution, setConstitution] = useState<string>(localStorage.getItem('sim_constitution') || 'normal');
+  // ユーザーの基本情報（初期値は一旦固定、useEffectで上書きする）
+  const [weight, setWeight] = useState<string>('60');
+  const [gender, setGender] = useState<string>('male');
+  const [constitution, setConstitution] = useState<string>('normal');
   
   // 飲んだお酒のリスト
   const [drinks, setDrinks] = useState<DrinkRecord[]>([]);
@@ -70,12 +72,29 @@ const Simulation = () => {
   const [result, setResult] = useState<SimulationResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // ユーザー情報を変更したらlocalStorageに保存（次回の手間を省く）
+  // コンポーネントマウント時やユーザー情報変更時に値をセット
   useEffect(() => {
-    localStorage.setItem('sim_weight', weight);
-    localStorage.setItem('sim_gender', gender);
-    localStorage.setItem('sim_constitution', constitution);
-  }, [weight, gender, constitution]);
+    if (isLoggedIn && user) {
+      // ログインしていて、プロフに値があればそれを優先
+      if (user.weight) setWeight(user.weight.toString());
+      if (user.gender) setGender(user.gender);
+      if (user.constitution) setConstitution(user.constitution);
+    } else {
+      // 未ログインならlocalStorageから復元
+      setWeight(localStorage.getItem('sim_weight') || '60');
+      setGender(localStorage.getItem('sim_gender') || 'male');
+      setConstitution(localStorage.getItem('sim_constitution') || 'normal');
+    }
+  }, [isLoggedIn, user]);
+
+  // ユーザーが手動で変更したら、未ログイン時用に一応localStorageにも保存
+  useEffect(() => {
+    if (!isLoggedIn) {
+      localStorage.setItem('sim_weight', weight);
+      localStorage.setItem('sim_gender', gender);
+      localStorage.setItem('sim_constitution', constitution);
+    }
+  }, [weight, gender, constitution, isLoggedIn]);
 
   // プリセットからお酒を追加する関数
   const addPresetDrink = (preset: typeof PRESETS[0]) => {
@@ -138,12 +157,42 @@ const Simulation = () => {
       </div>
 
       <div className="space-y-8">
+        
+        {/* 未ログインユーザーへの訴求バナー */}
+        {!isLoggedIn && (
+          <div className="bg-gradient-to-r from-orange-50 to-orange-100 border border-orange-200 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="bg-white p-2 rounded-full text-primary shadow-sm flex-shrink-0">
+                <LogIn className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-gray-800">ログインして便利に使おう！</p>
+                <p className="text-xs text-gray-600 mt-0.5">体重や体質が自動保存され、毎回の入力が不要になります。</p>
+              </div>
+            </div>
+            <Link 
+              to="/login" 
+              className="whitespace-nowrap bg-primary text-white text-sm font-bold px-5 py-2.5 rounded-full hover:bg-orange-600 transition-colors shadow-sm"
+            >
+              ログイン / 登録
+            </Link>
+          </div>
+        )}
+
         {/* --- 1. あなたの情報 --- */}
         <section className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-          <h3 className="font-bold text-lg text-gray-800 mb-5 flex items-center gap-2">
-            <User className="w-5 h-5 text-primary" />
-            あなたの情報
-          </h3>
+          <div className="flex justify-between items-center mb-5">
+            <h3 className="font-bold text-lg text-gray-800 flex items-center gap-2">
+              <User className="w-5 h-5 text-primary" />
+              あなたの情報
+            </h3>
+            {/* ログイン中で値が入っている場合のアピール */}
+            {isLoggedIn && user?.weight && (
+              <span className="text-[10px] bg-green-50 text-green-600 px-2 py-1 rounded-md font-bold">
+                プロフィールから自動入力済み
+              </span>
+            )}
+          </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>

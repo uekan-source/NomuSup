@@ -2,12 +2,11 @@ module Api
   module V1
     class SymptomsController < ApplicationController
       def index
-        # 1. 指定されたタイミングのデータを一括で取得する
         base_query = Symptom.where(timing: params[:timing])
 
-        # 2. 取得したデータをカテゴリごとに振り分けて返却する
         render json: {
-          symptoms: base_query.where(category: 0), # 症状
+          moods: base_query.where(category: 2),        # 💡 追加：気分・予定
+          symptoms: base_query.where(category: 0),     # 症状
           constitutions: base_query.where(category: 1) # 体質
         }, status: :ok
       end
