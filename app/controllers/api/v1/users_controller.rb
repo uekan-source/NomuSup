@@ -3,10 +3,9 @@ module Api
     class UsersController < ApplicationController
       def show
         if current_user
-          # 💡 返却するJSONに weight, gender, constitution を追加
-          render json: { 
-            id: current_user.id, 
-            name: current_user.name, 
+          render json: {
+            id: current_user.id,
+            name: current_user.name,
             email: current_user.email,
             weight: current_user.weight,
             gender: current_user.gender,
@@ -28,7 +27,6 @@ module Api
       private
 
       def user_params
-        # 💡 permitの許可リストに weight, gender, constitution を追加
         params.require(:user).permit(:name, :email, :weight, :gender, :constitution)
       end
     end
