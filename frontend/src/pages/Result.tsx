@@ -5,9 +5,13 @@ import client from '../api/client';
 import type { Drug } from '../types';
 import { 
   Sparkles, ShoppingCart, RefreshCcw, Save, Lightbulb, 
-  MapPin, ExternalLink, ChevronDown, ChevronUp, UserCircle, Droplet
+  MapPin, ExternalLink, ChevronDown, ChevronUp, Droplet
 } from 'lucide-react';
 import DiagnosisHeader from '../components/shared/DiagnosisHeader';
+
+// 💡 1. 作成した2つの画像をインポート
+import PrescriptionImg from '../assets/images/prescription_result.png';
+import PharmacistImg from '../assets/images/pharmacist_advice.png';
 
 const customStyles = `
   @keyframes bounce-subtle {
@@ -157,10 +161,9 @@ const Result = () => {
 
       {/* 2. Title */}
       <div className="text-center mb-12 relative z-10 animate-fadeSlideInUp" style={{ animationDelay: `${DELAY_STEP * 1}ms` }}>
-        <div className={`inline-block p-3 rounded-full mb-4 shadow-lg ${
-          isHangoverMode ? 'bg-gradient-to-br from-blue-400 to-cyan-500 shadow-cyan-200' : 'bg-gradient-to-br from-orange-400 to-primary shadow-orange-200'
-        }`}>
-          {isHangoverMode ? <Droplet className="text-white w-8 h-8" /> : <Sparkles className="text-white w-8 h-8" />}
+        {/* 💡 処方箋イラストに変更！背景の丸い色を消して、画像を少し大きく配置 */}
+        <div className="w-28 h-28 mx-auto mb-2 animate-bounce-subtle">
+          <img src={PrescriptionImg} alt="あなたの処方箋" className="w-full h-full object-contain drop-shadow-md" />
         </div>
         <h2 className={`text-3xl lg:text-4xl font-extrabold mb-3 tracking-tight ${isHangoverMode ? 'text-blue-900' : 'text-gray-800'}`}>
           あなたへの処方箋
@@ -180,21 +183,17 @@ const Result = () => {
           <div className="animate-fadeSlideInUp" style={{ animationDelay: `${DELAY_STEP * 2}ms` }}>
             <div className="flex gap-4 items-start">
               
-              {/* 💡 薬剤師アバター：翌朝はエメラルド、通常はブルー */}
+              {/* 💡 薬剤師イラストに変更！ */}
               <div className="flex flex-col items-center gap-1 flex-shrink-0">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center shadow-md
-                  ${isHangoverMode 
-                    ? 'bg-gradient-to-br from-emerald-400 to-emerald-600' 
-                    : 'bg-gradient-to-br from-blue-400 to-blue-600'}`}
-                >
-                  <UserCircle className="text-white w-8 h-8" />
+                <div className="w-16 h-16 flex items-center justify-center">
+                  <img src={PharmacistImg} alt="薬剤師" className="w-full h-full object-contain drop-shadow-sm" />
                 </div>
                 <span className={`text-[10px] font-bold ${isHangoverMode ? 'text-emerald-600' : 'text-blue-600'}`}>
                   薬剤師
                 </span>
               </div>
 
-              {/* 💡 吹き出し：翌朝はエメラルド、通常はブルー */}
+              {/* 吹き出し */}
               <div className={`relative p-5 rounded-2xl rounded-tl-none border shadow-sm flex-grow
                 ${isHangoverMode 
                   ? 'bg-gradient-to-br from-emerald-50 to-white border-emerald-100' 
@@ -239,7 +238,6 @@ const Result = () => {
             return (
               <div 
                 key={drug.id} 
-                // 💡 バッジが綺麗に収まる元のデザイン（overflow-hidden と pt-16 を維持）
                 className={`bg-white transition-all duration-300 overflow-hidden relative animate-fadeSlideInUp
                   ${isBestMatch 
                     ? `rounded-[2.5rem] border-4 pt-16 px-6 md:px-8 pb-8 ${
@@ -290,7 +288,6 @@ const Result = () => {
                     </p>
 
                     {drug.pharmacist_advice && (
-                      // 💡 カード内ワンポイント：翌朝はエメラルド、通常はオレンジ
                       <div className={`p-5 rounded-2xl mb-6 flex items-start gap-3 border ${
                         isHangoverMode ? 'bg-emerald-50/50 border-emerald-100/50' : 'bg-orange-50/50 border-orange-100/50'
                       }`}>
@@ -309,7 +306,7 @@ const Result = () => {
                     <div className="flex flex-col gap-3 mt-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <a 
-                          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`}
+                          href={`http://googleusercontent.com/maps.google.com/?q=${encodeURIComponent(mapQuery)}`}
                           target="_blank" rel="noopener noreferrer"
                           className={`flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold transition-colors ${
                             isMedicine 

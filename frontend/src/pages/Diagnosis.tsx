@@ -10,6 +10,59 @@ import {
   BatteryWarning, CloudRain, HeartPulse, Droplet
 } from 'lucide-react';
 
+// ==========================================
+// 💡 全30枚のイラストをインポート
+// ==========================================
+// 1. 予定 (timing=0)
+import PlanHeavyDrinkingImg from '../assets/images/plan_heavy_drinking.png';
+import PlanCarbonatedImg from '../assets/images/plan_carbonated.png';
+import PlanMixingDrinksImg from '../assets/images/plan_mixing_drinks.png';
+import PlanOilyFoodImg from '../assets/images/plan_oily_food.png';
+import PlanImportantEventImg from '../assets/images/plan_important_event.png';
+
+// 2. コンディション (timing=0)
+import CondYesterdayHangoverImg from '../assets/images/cond_yesterday_hangover.png';
+import CondHungryImg from '../assets/images/cond_hungry.png';
+import CondStomachIssueImg from '../assets/images/cond_stomach_issue.png';
+import CondDehydratedImg from '../assets/images/cond_dehydrated.png';
+import CondMouthSkinImg from '../assets/images/cond_mouth_skin.png';
+
+// 3. 体質 (timing=0, 1)
+import CondFlushImg from '../assets/images/cond_flush.png';
+import CondHangoverImg from '../assets/images/cond_hangover.png';
+import CondStomachImg from '../assets/images/cond_stomach.png';
+import CondEdemaImg from '../assets/images/cond_edema.png';
+import CondHeadacheImg from '../assets/images/cond_headache.png';
+
+// 4. 飲みすぎた: 気分 (timing=1)
+import MoodRamenImg from '../assets/images/mood_ramen.png';
+import MoodRefreshImg from '../assets/images/mood_refresh.png';
+import MoodTipsyImg from '../assets/images/mood_tipsy.png';
+import MoodThirstyImg from '../assets/images/mood_thirsty.png';
+import MoodTiredImg from '../assets/images/mood_tired.png';
+
+// 5. 飲みすぎた: 症状 (timing=1)
+import CondNauseaImg from '../assets/images/cond_nausea.png';
+import CondDizzinessImg from '../assets/images/cond_dizziness.png';
+import CondThirstImg from '../assets/images/cond_thirst.png';
+import CondStomachAcheImg from '../assets/images/cond_stomach_ache.png';
+import CondFeverImg from '../assets/images/cond_fever.png';
+
+// 6. 翌朝: 気分 (timing=2)
+import MoodHangoverHeavyBodyImg from '../assets/images/mood_hangover_heavy_body.png';
+import MoodHangoverThirstImg from '../assets/images/mood_hangover_thirst.png';
+import MoodHangoverNoAppetiteImg from '../assets/images/mood_hangover_no_appetite.png';
+import MoodHangoverRegretImg from '../assets/images/mood_hangover_regret.png';
+import MoodHangoverBrainFogImg from '../assets/images/mood_hangover_brain_fog.png';
+
+// 7. 翌朝: 症状 (timing=2)
+import CondHangoverHeadacheImg from '../assets/images/cond_hangover_headache.png';
+import CondHangoverNauseaImg from '../assets/images/cond_hangover_nausea.png';
+import CondHangoverLethargyImg from '../assets/images/cond_hangover_lethargy.png';
+import CondHangoverEdemaImg from '../assets/images/cond_hangover_edema.png';
+import CondHangoverDiarrheaImg from '../assets/images/cond_hangover_diarrhea.png';
+
+
 const Diagnosis = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -17,14 +70,12 @@ const Diagnosis = () => {
 
   const isHangoverMode = timing === '2';
 
-  // 💡 category: 2 (気分・予定) 用のstateを追加
   const [moods, setMoods] = useState<Symptom[]>([]);
   const [symptoms, setSymptoms] = useState<Symptom[]>([]);
   const [constitutions, setConstitutions] = useState<Symptom[]>([]);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // 💡 timing=2の時は、入力ステップを2つ（気分・症状）で終了させる
   const maxStep = isHangoverMode ? 2 : 3;
   const [wizardStep, setWizardStep] = useState<number>(1);
 
@@ -32,7 +83,7 @@ const Diagnosis = () => {
     const fetchSymptoms = async () => {
       try {
         const response = await client.get(`/symptoms?timing=${timing}`);
-        setMoods(response.data.moods);                 // 💡 追加
+        setMoods(response.data.moods);
         setSymptoms(response.data.symptoms);
         setConstitutions(response.data.constitutions);
       } catch (error) {
@@ -62,7 +113,6 @@ const Diagnosis = () => {
     }
   };
 
-  // 💡 複雑なフィルター処理がなくなり、APIのデータをそのまま渡すだけに！
   const getStepData = () => {
     if (timing === '0') {
       return {
@@ -81,12 +131,11 @@ const Diagnosis = () => {
         title1: '今の気分は？', title2: '具体的な症状は？', title3: 'あなたの体質は？'
       };
     } else {
-      // 💡 翌朝 (timing=2) は体質を省略し、全3ステップに変更
       return {
         header: [{ id: 1, label: '気分' }, { id: 2, label: '症状' }, { id: 3, label: '結果' }],
         step1: moods,
         step2: symptoms,
-        step3: [], // 使用しない
+        step3: [],
         title1: '今の気分は？', title2: '具体的な症状は？', title3: ''
       };
     }
@@ -96,11 +145,67 @@ const Diagnosis = () => {
   const currentItems = wizardStep === 1 ? currentConfig.step1 : wizardStep === 2 ? currentConfig.step2 : currentConfig.step3;
   const currentTitle = wizardStep === 1 ? currentConfig.title1 : wizardStep === 2 ? currentConfig.title2 : currentConfig.title3;
 
+  // ==========================================
+  // 💡 テキストと画像を紐づけるロジック
+  // ==========================================
+  const getImageForText = (text: string) => {
+    // --- 1. 予定 ---
+    if (text.includes('深酒')) return PlanHeavyDrinkingImg;
+    if (text.includes('炭酸')) return PlanCarbonatedImg;
+    if (text.includes('チャンポン') || text.includes('種類')) return PlanMixingDrinksImg;
+    if (text.includes('脂っこい')) return PlanOilyFoodImg;
+    if (text.includes('外せない')) return PlanImportantEventImg;
+
+    // --- 2. コンディション ---
+    if (text.includes('残っている')) return CondYesterdayHangoverImg;
+    if (text.includes('空腹')) return CondHungryImg;
+    if (text.includes('胃の調子')) return CondStomachIssueImg;
+    if (text.includes('渇いている・脱水')) return CondDehydratedImg;
+    if (text.includes('口内炎')) return CondMouthSkinImg;
+
+    // --- 3. 体質 ---
+    if (text.includes('赤くなる体質')) return CondFlushImg;
+    if (text.includes('残りやすくなった体質')) return CondHangoverImg;
+    if (text.includes('もたれやすい体質')) return CondStomachImg;
+    if (text.includes('むくむ体質')) return CondEdemaImg;
+    if (text.includes('頭痛が起きる体質')) return CondHeadacheImg;
+
+    // --- 4. 飲みすぎた: 気分 ---
+    if (text.includes('締めを食べたい')) return MoodRamenImg;
+    if (text.includes('ガブ飲み')) return MoodRefreshImg;
+    if (text.includes('フワフワ')) return MoodTipsyImg;
+    if (text.includes('飲み足りない')) return MoodThirstyImg;
+    if (text.includes('横になりたい・だるい')) return MoodTiredImg;
+
+    // --- 5. 飲みすぎた: 症状 ---
+    if (text.includes('ムカムカする吐き気')) return CondNauseaImg;
+    if (text.includes('足元がふらつく')) return CondDizzinessImg;
+    if (text.includes('異常に喉が渇く')) return CondThirstImg;
+    if (text.includes('胃がキリキリ')) return CondStomachAcheImg;
+    if (text.includes('異常に熱い')) return CondFeverImg;
+
+    // --- 6. 翌朝: 気分 ---
+    if (text.includes('起き上がれない')) return MoodHangoverHeavyBodyImg;
+    if (text.includes('とにかく水分が欲しい')) return MoodHangoverThirstImg;
+    if (text.includes('何も食べたくない')) return MoodHangoverNoAppetiteImg;
+    if (text.includes('記憶が曖昧')) return MoodHangoverRegretImg;
+    if (text.includes('頭がボーッと')) return MoodHangoverBrainFogImg;
+
+    // --- 7. 翌朝: 症状 ---
+    if (text.includes('ズキズキ')) return CondHangoverHeadacheImg;
+    if (text.includes('吐き気・胃もたれ')) return CondHangoverNauseaImg;
+    if (text.includes('極度にだるい')) return CondHangoverLethargyImg;
+    if (text.includes('むくみがひどい')) return CondHangoverEdemaImg;
+    if (text.includes('下痢')) return CondHangoverDiarrheaImg;
+
+    return null; // 画像がない場合はnull
+  };
+
+  // 万が一画像がない場合のフォールバックアイコン
   const getIconForText = (text: string, isSelected: boolean) => {
     const defaultColor = isHangoverMode ? 'text-cyan-500' : 'text-primary';
     const iconClass = `w-7 h-7 flex-shrink-0 transition-colors duration-300 ${isSelected ? 'text-white' : defaultColor}`;
     
-    // キーワードによるアイコン出し分けはそのまま維持
     if (text.includes('空腹')) return <Utensils className={iconClass} />;
     if (text.includes('予定')) return <Calendar className={iconClass} />;
     if (text.includes('炭酸') || text.includes('お酒')) return <Beer className={iconClass} />;
@@ -158,6 +263,9 @@ const Diagnosis = () => {
             ) : (
               currentItems.map(item => {
                 const isSelected = selectedIds.includes(item.id);
+                // 💡 アイテム名から対応する画像を取得
+                const imageSrc = getImageForText(item.name);
+
                 return (
                   <button 
                     key={item.id} 
@@ -178,14 +286,21 @@ const Diagnosis = () => {
                         : 'bg-transparent'
                     }`}></div>
 
-                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mr-5 transition-all duration-300 z-10
-                      ${isHangoverMode 
-                        ? (isSelected ? 'bg-gradient-to-br from-blue-400 to-cyan-400 shadow-inner' : 'bg-blue-50 group-hover:bg-blue-100')
-                        : (isSelected ? 'bg-gradient-to-br from-orange-400 to-primary shadow-inner' : 'bg-orange-50 group-hover:bg-orange-100')
-                      }
-                    `}>
-                      {getIconForText(item.name, isSelected)}
-                    </div>
+                    {/* 画像がある場合はイラストを、ない場合はフォールバックのアイコンを表示 */}
+                    {imageSrc ? (
+                      <div className={`w-16 h-16 flex items-center justify-center mr-5 transition-transform duration-300 group-hover:scale-110 z-10`}>
+                        <img src={imageSrc} alt={item.name} className="w-full h-full object-contain" />
+                      </div>
+                    ) : (
+                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mr-5 transition-all duration-300 z-10
+                        ${isHangoverMode 
+                          ? (isSelected ? 'bg-gradient-to-br from-blue-400 to-cyan-400 shadow-inner' : 'bg-blue-50 group-hover:bg-blue-100')
+                          : (isSelected ? 'bg-gradient-to-br from-orange-400 to-primary shadow-inner' : 'bg-orange-50 group-hover:bg-orange-100')
+                        }
+                      `}>
+                        {getIconForText(item.name, isSelected)}
+                      </div>
+                    )}
 
                     <span className={`text-lg font-bold flex-grow z-10 transition-colors duration-300 ${
                       isHangoverMode 
@@ -227,7 +342,6 @@ const Diagnosis = () => {
             )}
 
             <button 
-              // 💡 3ではなく、maxStep (2 または 3) で判定するように変更
               onClick={wizardStep < maxStep ? () => setWizardStep(prev => prev + 1) : handleSubmit}
               disabled={selectedIds.length === 0 && wizardStep === maxStep}
               className={`flex-grow py-4 rounded-full text-lg font-bold transition-all flex items-center justify-center gap-2
