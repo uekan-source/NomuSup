@@ -3,13 +3,13 @@ import { useNavigate, Link } from 'react-router-dom';
 import client from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { 
-  Scale, User, Activity, Trash2, Plus, AlertTriangle, Clock, ChevronLeft, LogIn 
-} from 'lucide-react';
+  Scale, User, Activity, Plus, AlertTriangle, Clock, ChevronLeft, LogIn, X 
+} from 'lucide-react'; // 💡 X（バツ印）アイコンを追加
 
-// 💡 画面トップ用のイラストをインポート
+// 💡 画面トップ用のイラスト
 import CalcImg from '../assets/images/calc.png';
 
-// 💡 お酒のイラストをインポート（全16種類）
+// 💡 お酒のイラスト全16種類
 import BeerMugImg from '../assets/images/beer_mug.png';
 import BeerCanImg from '../assets/images/beer_can.png';
 import BeerBottleImg from '../assets/images/beer_bottle.png';
@@ -27,6 +27,12 @@ import SakeImg from '../assets/images/sake.png';
 import ShochuWaterImg from '../assets/images/shochu_water.png';
 import ShochuRockImg from '../assets/images/shochu_rock.png';
 import ShotImg from '../assets/images/shot.png';
+
+// 💡 スクロールバーを隠すためのカスタムCSS
+const customStyles = `
+  .hide-scrollbar::-webkit-scrollbar { display: none; }
+  .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+`;
 
 interface SimulationResult {
   pure_alcohol_g: number;
@@ -128,6 +134,7 @@ const Simulation = () => {
       });
       
       setResult(response.data.data);
+      // 結果が出たら少し下にスクロールさせる
       setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 100);
     } catch (error) {
       console.error('シミュレーションに失敗しました', error);
@@ -138,13 +145,15 @@ const Simulation = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto py-8 px-6 animate-fadeIn pb-32">
+    // 💡 フッターが被らないように pb-48（下の余白）を大きめに設定
+    <div className="max-w-2xl mx-auto py-8 px-6 animate-fadeIn pb-48">
+      <style>{customStyles}</style>
+
       <button onClick={() => navigate(-1)} className="flex items-center text-gray-500 hover:text-primary transition-colors mb-6">
         <ChevronLeft className="w-5 h-5" />
         <span>戻る</span>
       </button>
 
-      {/* 💡 ここをアイコンから calc.png に変更！ */}
       <div className="text-center mb-10">
         <div className="w-24 h-24 mx-auto mb-4 animate-bounce-slow">
           <img src={CalcImg} alt="シミュレーション" className="w-full h-full object-contain drop-shadow-sm" />
@@ -244,10 +253,10 @@ const Simulation = () => {
         <section className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
           <h3 className="font-bold text-lg text-gray-800 mb-5 flex items-center gap-2">
             <span className="bg-orange-100 p-2 rounded-lg text-primary text-xl">🍻</span>
-            飲んだお酒を追加
+            飲んだお酒をタップして追加
           </h3>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             {PRESETS.map((preset, index) => (
               <button
                 key={index}
@@ -262,47 +271,7 @@ const Simulation = () => {
               </button>
             ))}
           </div>
-
-          <div className="bg-gray-50 rounded-2xl p-4 min-h-[100px]">
-            {drinks.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center text-gray-400 py-6">
-                <Plus className="w-8 h-8 mb-2 opacity-50" />
-                <p className="text-sm">上から飲んだお酒をタップして追加</p>
-              </div>
-            ) : (
-              <ul className="space-y-3">
-                {drinks.map((drink) => (
-                  <li key={drink.id} className="flex justify-between items-center bg-white p-3 rounded-xl shadow-sm border border-gray-100 animate-fadeIn">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 bg-orange-50 rounded-lg p-1">
-                        <img src={drink.image} alt={drink.name} className="w-full h-full object-contain" />
-                      </div>
-                      <div>
-                        <p className="font-bold text-gray-800 text-sm">{drink.name}</p>
-                        <p className="text-xs text-gray-500">{drink.volume}ml / アルコール{drink.abv}%</p>
-                      </div>
-                    </div>
-                    <button onClick={() => removeDrink(drink.id)} className="text-gray-300 hover:text-red-500 transition-colors p-2">
-                      <Trash2 className="w-5 h-5" />
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
         </section>
-
-        <button
-          onClick={handleCalculate}
-          disabled={drinks.length === 0 || !weight || isLoading}
-          className={`w-full py-4 rounded-full font-bold text-lg transition-all shadow-lg flex justify-center items-center gap-2 ${
-            drinks.length === 0 || !weight
-              ? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none'
-              : 'bg-primary text-white hover:bg-orange-600 hover:shadow-xl hover:-translate-y-1'
-          }`}
-        >
-          {isLoading ? '計算中...' : '分解時間を計算する'}
-        </button>
 
         {result && (
           <section className="bg-gradient-to-br from-gray-900 to-gray-800 p-8 rounded-3xl shadow-2xl animate-fadeSlideInUp text-white relative overflow-hidden mt-8">
@@ -342,6 +311,54 @@ const Simulation = () => {
             </div>
           </section>
         )}
+      </div>
+
+      {/* ==============================================================
+          💡 ここからが新機能：画面下部に固定される「カート風フローティングバー」
+      ============================================================== */}
+      <div className="fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-md border-t border-gray-200 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.15)] z-50">
+        <div className="max-w-2xl mx-auto px-6 py-4">
+          
+          {/* 追加したお酒を横スクロールで表示 */}
+          {drinks.length > 0 ? (
+            <div className="flex gap-3 overflow-x-auto pb-3 mb-1 hide-scrollbar snap-x">
+              {drinks.map((drink) => (
+                <div key={drink.id} className="snap-start flex-shrink-0 relative bg-orange-50/80 rounded-2xl p-2.5 border border-orange-100 flex items-center gap-3 animate-fadeIn">
+                  <div className="w-10 h-10 bg-white rounded-xl p-1 shadow-sm">
+                    <img src={drink.image} alt={drink.name} className="w-full h-full object-contain" />
+                  </div>
+                  <div className="pr-4">
+                    <p className="text-xs font-bold text-gray-800 whitespace-nowrap">{drink.name}</p>
+                    <p className="text-[10px] text-gray-500">{drink.volume}ml / {drink.abv}%</p>
+                  </div>
+                  <button 
+                    onClick={() => removeDrink(drink.id)} 
+                    className="absolute -top-2 -right-2 bg-white rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 shadow-md border border-gray-100 p-1.5 transition-colors"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-xs text-gray-400 mb-3 font-medium flex items-center justify-center gap-2">
+              <Plus className="w-4 h-4 opacity-50" />
+              追加したお酒がここに表示されます
+            </div>
+          )}
+
+          <button
+            onClick={handleCalculate}
+            disabled={drinks.length === 0 || !weight || isLoading}
+            className={`w-full py-4 rounded-full font-bold text-lg transition-all shadow-lg flex justify-center items-center gap-2 ${
+              drinks.length === 0 || !weight
+                ? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none'
+                : 'bg-gradient-to-r from-orange-500 to-primary text-white hover:shadow-xl hover:-translate-y-0.5'
+            }`}
+          >
+            {isLoading ? '計算中...' : drinks.length > 0 ? `${drinks.length}杯で分解時間を計算する` : '分解時間を計算する'}
+          </button>
+        </div>
       </div>
     </div>
   );

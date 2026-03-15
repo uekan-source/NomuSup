@@ -1,8 +1,4 @@
 Rails.application.routes.draw do
-  get '/run_seed', to: ->(_env) { 
-    Rails.application.load_seed
-    [200, { 'Content-Type' => 'text/plain' }, ['Seed generated successfully!']] 
-  }
   namespace :api do
     namespace :v1 do
       get 'health_check', to: 'health_check#index'
