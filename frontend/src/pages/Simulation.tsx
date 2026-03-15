@@ -3,11 +3,31 @@ import { useNavigate, Link } from 'react-router-dom';
 import client from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { 
-  Calculator, Scale, User, Activity, Beer, Wine, GlassWater, 
-  Trash2, Plus, AlertTriangle, Clock, ChevronLeft, Zap, Martini, LogIn
+  Scale, User, Activity, Trash2, Plus, AlertTriangle, Clock, ChevronLeft, LogIn 
 } from 'lucide-react';
 
-// APIからのレスポンスの型
+// 💡 画面トップ用のイラストをインポート
+import CalcImg from '../assets/images/calc.png';
+
+// 💡 お酒のイラストをインポート（全16種類）
+import BeerMugImg from '../assets/images/beer_mug.png';
+import BeerCanImg from '../assets/images/beer_can.png';
+import BeerBottleImg from '../assets/images/beer_bottle.png';
+import LemonSourImg from '../assets/images/lemon_sour.png';
+import OolongHaiImg from '../assets/images/oolong_hai.png';
+import ChuhaiCanImg from '../assets/images/chuhai_can.png';
+import StrongCanImg from '../assets/images/strong_can.png';
+import HighballImg from '../assets/images/highball.png';
+import WineGlassImg from '../assets/images/wine_glass.png';
+import WineBottleImg from '../assets/images/wine_bottle.png';
+import CocktailImg from '../assets/images/cocktail.png';
+import UmeshuRockImg from '../assets/images/umeshu_rock.png';
+import UmeshuWaterImg from '../assets/images/umeshu_water.png';
+import SakeImg from '../assets/images/sake.png';
+import ShochuWaterImg from '../assets/images/shochu_water.png';
+import ShochuRockImg from '../assets/images/shochu_rock.png';
+import ShotImg from '../assets/images/shot.png';
+
 interface SimulationResult {
   pure_alcohol_g: number;
   time_in_hours: number;
@@ -15,79 +35,58 @@ interface SimulationResult {
   advice: string;
 }
 
-// 追加したお酒の型
 interface DrinkRecord {
   id: string;
   name: string;
   volume: number;
   abv: number;
+  image: string;
 }
 
-// プリセットの定義（18種類）
 const PRESETS = [
-  // --- ビール・サワー系 ---
-  { name: 'ビール(中ジョッキ)', volume: 500, abv: 5, icon: <Beer className="w-5 h-5" /> },
-  { name: '缶ビール(350ml)', volume: 350, abv: 5, icon: <Beer className="w-5 h-5" /> },
-  { name: '瓶ビール(中瓶)', volume: 500, abv: 5, icon: <Beer className="w-5 h-5" /> },
-  { name: 'レモンサワー(ジョッキ)', volume: 400, abv: 5, icon: <GlassWater className="w-5 h-5" /> },
-  { name: 'ウーロンハイ', volume: 400, abv: 4, icon: <GlassWater className="w-5 h-5" /> },
-  
-  // --- 缶チューハイ系 ---
-  { name: 'チューハイ(缶)', volume: 350, abv: 5, icon: <GlassWater className="w-5 h-5" /> },
-  { name: 'ストロング系(缶)', volume: 350, abv: 9, icon: <Zap className="w-5 h-5" /> },
-  { name: 'ハイボール(缶/ジョッキ)', volume: 350, abv: 7, icon: <GlassWater className="w-5 h-5" /> },
-  
-  // --- ワイン系 ---
-  { name: 'ワイン(グラス)', volume: 120, abv: 12, icon: <Wine className="w-5 h-5" /> },
-  { name: 'ボトルワイン(1本)', volume: 750, abv: 12, icon: <Wine className="w-5 h-5" /> },
-  
-  // --- カクテル・梅酒 ---
-  { name: 'カクテル(カシス等)', volume: 200, abv: 5, icon: <Martini className="w-5 h-5" /> },
-  { name: '梅酒(ロック)', volume: 90, abv: 14, icon: <GlassWater className="w-5 h-5" /> },
-  { name: '梅酒水割り', volume: 200, abv: 7, icon: <GlassWater className="w-5 h-5" /> },
-  { name: '梅酒ソーダ割', volume: 200, abv: 7, icon: <GlassWater className="w-5 h-5" /> },
-  
-  // --- 焼酎・日本酒 ---
-  { name: '日本酒(一合)', volume: 180, abv: 15, icon: <GlassWater className="w-5 h-5" /> },
-  { name: '焼酎(水割り/お湯割り)', volume: 200, abv: 10, icon: <GlassWater className="w-5 h-5" /> },
-  { name: '焼酎(ロック)', volume: 90, abv: 25, icon: <GlassWater className="w-5 h-5" /> },
-  
-  // --- ハードリカー ---
-  { name: 'テキーラ/ウイスキー(ショット)', volume: 30, abv: 40, icon: <Martini className="w-5 h-5" /> },
+  { name: 'ビール(中ジョッキ)', volume: 500, abv: 5, image: BeerMugImg },
+  { name: '缶ビール(350ml)', volume: 350, abv: 5, image: BeerCanImg },
+  { name: '瓶ビール(中瓶)', volume: 500, abv: 5, image: BeerBottleImg },
+  { name: 'レモンサワー(ジョッキ)', volume: 400, abv: 5, image: LemonSourImg },
+  { name: 'ウーロンハイ', volume: 400, abv: 4, image: OolongHaiImg },
+  { name: 'チューハイ(缶)', volume: 350, abv: 5, image: ChuhaiCanImg },
+  { name: 'ストロング系(缶)', volume: 350, abv: 9, image: StrongCanImg },
+  { name: 'ハイボール(缶/ジョッキ)', volume: 350, abv: 7, image: HighballImg },
+  { name: 'ワイン(グラス)', volume: 120, abv: 12, image: WineGlassImg },
+  { name: 'ボトルワイン(1本)', volume: 750, abv: 12, image: WineBottleImg },
+  { name: 'カクテル(カシス等)', volume: 200, abv: 5, image: CocktailImg },
+  { name: '梅酒(ロック)', volume: 90, abv: 14, image: UmeshuRockImg },
+  { name: '梅酒水割り', volume: 200, abv: 7, image: UmeshuWaterImg },
+  { name: '梅酒ソーダ割', volume: 200, abv: 7, image: UmeshuWaterImg }, 
+  { name: '日本酒(一合)', volume: 180, abv: 15, image: SakeImg },
+  { name: '焼酎(水割り/お湯割り)', volume: 200, abv: 10, image: ShochuWaterImg },
+  { name: '焼酎(ロック)', volume: 90, abv: 25, image: ShochuRockImg },
+  { name: 'テキーラ/ウイスキー(ショット)', volume: 30, abv: 40, image: ShotImg },
 ];
 
 const Simulation = () => {
   const navigate = useNavigate();
   const { user, isLoggedIn } = useAuth();
   
-  // ユーザーの基本情報（初期値は一旦固定、useEffectで上書きする）
   const [weight, setWeight] = useState<string>('60');
   const [gender, setGender] = useState<string>('male');
   const [constitution, setConstitution] = useState<string>('normal');
-  
-  // 飲んだお酒のリスト
   const [drinks, setDrinks] = useState<DrinkRecord[]>([]);
-  
-  // 結果とローディング状態
   const [result, setResult] = useState<SimulationResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // コンポーネントマウント時やユーザー情報変更時に値をセット
   useEffect(() => {
     if (isLoggedIn && user) {
-      // ログインしていて、プロフに値があればそれを優先
       if (user.weight) setWeight(user.weight.toString());
       if (user.gender) setGender(user.gender);
       if (user.constitution) setConstitution(user.constitution);
     } else {
-      // 未ログインならlocalStorageから復元
       setWeight(localStorage.getItem('sim_weight') || '60');
       setGender(localStorage.getItem('sim_gender') || 'male');
       setConstitution(localStorage.getItem('sim_constitution') || 'normal');
     }
   }, [isLoggedIn, user]);
 
-  // ユーザーが手動で変更したら、未ログイン時用に一応localStorageにも保存
   useEffect(() => {
     if (!isLoggedIn) {
       localStorage.setItem('sim_weight', weight);
@@ -96,23 +95,21 @@ const Simulation = () => {
     }
   }, [weight, gender, constitution, isLoggedIn]);
 
-  // プリセットからお酒を追加する関数
   const addPresetDrink = (preset: typeof PRESETS[0]) => {
     const newDrink: DrinkRecord = {
       id: Math.random().toString(36).substring(2, 9),
       name: preset.name,
       volume: preset.volume,
       abv: preset.abv,
+      image: preset.image,
     };
     setDrinks([...drinks, newDrink]);
   };
 
-  // お酒をリストから削除する関数
   const removeDrink = (id: string) => {
     setDrinks(drinks.filter(drink => drink.id !== id));
   };
 
-  // 計算実行
   const handleCalculate = async () => {
     if (drinks.length === 0) {
       alert('お酒を追加してください');
@@ -131,7 +128,6 @@ const Simulation = () => {
       });
       
       setResult(response.data.data);
-      // 結果が見やすいように少しスクロール
       setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 100);
     } catch (error) {
       console.error('シミュレーションに失敗しました', error);
@@ -148,17 +144,16 @@ const Simulation = () => {
         <span>戻る</span>
       </button>
 
+      {/* 💡 ここをアイコンから calc.png に変更！ */}
       <div className="text-center mb-10">
-        <div className="inline-block bg-orange-100 p-4 rounded-full mb-4 text-primary shadow-sm">
-          <Calculator className="w-8 h-8" />
+        <div className="w-24 h-24 mx-auto mb-4 animate-bounce-slow">
+          <img src={CalcImg} alt="シミュレーション" className="w-full h-full object-contain drop-shadow-sm" />
         </div>
         <h2 className="text-3xl font-bold text-gray-800 mb-2">アルコール分解シミュレーター</h2>
         <p className="text-gray-500 text-sm">あなたの体格に合わせた、お酒が抜ける目安時間を計算します</p>
       </div>
 
       <div className="space-y-8">
-        
-        {/* 未ログインユーザーへの訴求バナー */}
         {!isLoggedIn && (
           <div className="bg-gradient-to-r from-orange-50 to-orange-100 border border-orange-200 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
@@ -179,14 +174,12 @@ const Simulation = () => {
           </div>
         )}
 
-        {/* --- 1. あなたの情報 --- */}
         <section className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
           <div className="flex justify-between items-center mb-5">
             <h3 className="font-bold text-lg text-gray-800 flex items-center gap-2">
               <User className="w-5 h-5 text-primary" />
               あなたの情報
             </h3>
-            {/* ログイン中で値が入っている場合のアピール */}
             {isLoggedIn && user?.weight && (
               <span className="text-[10px] bg-green-50 text-green-600 px-2 py-1 rounded-md font-bold">
                 プロフィールから自動入力済み
@@ -248,31 +241,28 @@ const Simulation = () => {
           </div>
         </section>
 
-        {/* --- 2. 飲んだお酒 --- */}
         <section className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
           <h3 className="font-bold text-lg text-gray-800 mb-5 flex items-center gap-2">
-            <Beer className="w-5 h-5 text-primary" />
+            <span className="bg-orange-100 p-2 rounded-lg text-primary text-xl">🍻</span>
             飲んだお酒を追加
           </h3>
 
-          {/* プリセットボタン */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
             {PRESETS.map((preset, index) => (
               <button
                 key={index}
                 onClick={() => addPresetDrink(preset)}
-                className="flex flex-col items-center justify-center p-3 bg-orange-50/50 border border-orange-100 rounded-2xl hover:bg-orange-100 hover:border-primary transition-colors group"
+                className="flex flex-col items-center justify-center p-4 bg-orange-50/50 border border-orange-100 rounded-2xl hover:bg-orange-100 hover:border-primary transition-colors group"
               >
-                <div className="text-primary mb-1 group-hover:scale-110 transition-transform">
-                  {preset.icon}
+                <div className="w-12 h-12 mb-3 group-hover:scale-110 transition-transform duration-300">
+                  <img src={preset.image} alt={preset.name} className="w-full h-full object-contain drop-shadow-sm" />
                 </div>
-                <span className="text-xs font-bold text-gray-700">{preset.name}</span>
-                <span className="text-[10px] text-gray-500">{preset.volume}ml / {preset.abv}%</span>
+                <span className="text-xs font-bold text-gray-700 text-center leading-tight">{preset.name}</span>
+                <span className="text-[10px] text-gray-500 mt-1">{preset.volume}ml / {preset.abv}%</span>
               </button>
             ))}
           </div>
 
-          {/* 追加されたお酒リスト */}
           <div className="bg-gray-50 rounded-2xl p-4 min-h-[100px]">
             {drinks.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-gray-400 py-6">
@@ -283,9 +273,9 @@ const Simulation = () => {
               <ul className="space-y-3">
                 {drinks.map((drink) => (
                   <li key={drink.id} className="flex justify-between items-center bg-white p-3 rounded-xl shadow-sm border border-gray-100 animate-fadeIn">
-                    <div className="flex items-center gap-3">
-                      <div className="bg-orange-100 p-2 rounded-lg text-primary">
-                        <Beer className="w-4 h-4" />
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 bg-orange-50 rounded-lg p-1">
+                        <img src={drink.image} alt={drink.name} className="w-full h-full object-contain" />
                       </div>
                       <div>
                         <p className="font-bold text-gray-800 text-sm">{drink.name}</p>
@@ -302,7 +292,6 @@ const Simulation = () => {
           </div>
         </section>
 
-        {/* --- 計算ボタン --- */}
         <button
           onClick={handleCalculate}
           disabled={drinks.length === 0 || !weight || isLoading}
@@ -315,7 +304,6 @@ const Simulation = () => {
           {isLoading ? '計算中...' : '分解時間を計算する'}
         </button>
 
-        {/* --- 3. 結果表示エリア --- */}
         {result && (
           <section className="bg-gradient-to-br from-gray-900 to-gray-800 p-8 rounded-3xl shadow-2xl animate-fadeSlideInUp text-white relative overflow-hidden mt-8">
             <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>

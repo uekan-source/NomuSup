@@ -1,14 +1,30 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ShieldCheck, Zap, History, ChevronRight, GlassWater, ListChecks, Sparkles, Beer, Coffee, Calculator } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
+
+// 💡 1. トップの4つの画像をインポート
+import BeforeImg from '../assets/images/before.png';
+import HangoverImg from '../assets/images/hangover.png';
+import MorningImg from '../assets/images/morning.png';
+import CalcImg from '../assets/images/calc.png';
+
+// 💡 2. 使い方の3ステップ用の画像をインポート
+import Step1Img from '../assets/images/step1.png';
+import Step2Img from '../assets/images/step2.png';
+import Step3Img from '../assets/images/step3.png';
+
+// 💡 3. 特徴セクション用の画像をインポート
+import Feature1Img from '../assets/images/feature1.png';
+import Feature2Img from '../assets/images/feature2.png';
+import Feature3Img from '../assets/images/feature3.png';
 
 const Home = () => {
   const [activeStep, setActiveStep] = useState(0);
 
   const steps = [
-    { id: 1, title: 'いまの状態を選ぶ', desc: '「これから飲む」「二日酔い」など、あなたの状況を選択します。', icon: <GlassWater className="w-10 h-10" /> },
-    { id: 2, title: '症状をタップ', desc: '当てはまる症状や、あなたの体質をチェックリストから選びます。', icon: <ListChecks className="w-10 h-10" /> },
-    { id: 3, title: '最適な対策がわかる', desc: '薬剤師監修のロジックで、今すぐできるケアや市販薬をご提案します。', icon: <Sparkles className="w-10 h-10" /> }
+    { id: 1, title: 'いまの状態を選ぶ', desc: '「これから飲む」「二日酔い」など、あなたの状況を選択します。', image: Step1Img },
+    { id: 2, title: '症状をタップ', desc: '当てはまる症状や、あなたの体質をチェックリストから選びます。', image: Step2Img },
+    { id: 3, title: '最適な対策がわかる', desc: '薬剤師監修のロジックで、今すぐできるケアや市販薬をご提案します。', image: Step3Img }
   ];
 
   useEffect(() => {
@@ -19,7 +35,7 @@ const Home = () => {
   return (
     <div className="flex flex-col animate-fadeIn bg-white">
       
-      {/* 1. ヒーローセクション（ビタミンオレンジのグラデーション） */}
+      {/* 1. ヒーローセクション */}
       <section className="relative bg-gradient-to-br from-orange-500 via-orange-400 to-orange-300 pt-20 pb-36 px-6 text-center overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-yellow-300/30 via-transparent to-transparent pointer-events-none"></div>
         <div className="relative z-10 max-w-3xl mx-auto">
@@ -38,8 +54,8 @@ const Home = () => {
       <section className="relative z-20 max-w-5xl mx-auto px-6 -mt-24 mb-12 w-full">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
           <Link to="/diagnosis?timing=0" className="group flex flex-col items-center bg-white/95 backdrop-blur-sm p-8 rounded-3xl shadow-xl shadow-orange-200/50 border-2 border-transparent hover:border-orange-400 transition-all duration-300 hover:-translate-y-1 no-underline">
-            <div className="bg-gradient-to-br from-orange-100 to-orange-50 text-primary w-16 h-16 rounded-2xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 shadow-inner">
-              <GlassWater className="w-8 h-8" />
+            <div className="w-24 h-24 mb-2 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+              <img src={BeforeImg} alt="これから飲む" className="w-full h-full object-contain drop-shadow-sm" />
             </div>
             <h3 className="text-xl font-bold text-gray-800 mb-2">これから飲む</h3>
             <p className="text-sm text-gray-500 text-center mb-6 flex-grow">事前の準備で<br/>明日の自分を救う</p>
@@ -47,9 +63,10 @@ const Home = () => {
               診断へ進む <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
             </div>
           </Link>
+
           <Link to="/diagnosis?timing=1" className="group flex flex-col items-center bg-white/95 backdrop-blur-sm p-8 rounded-3xl shadow-xl shadow-orange-200/50 border-2 border-transparent hover:border-orange-400 transition-all duration-300 hover:-translate-y-1 no-underline">
-            <div className="bg-gradient-to-br from-orange-100 to-orange-50 text-primary w-16 h-16 rounded-2xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 shadow-inner">
-              <Beer className="w-8 h-8" />
+            <div className="w-24 h-24 mb-2 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+              <img src={HangoverImg} alt="飲みすぎた" className="w-full h-full object-contain drop-shadow-sm" />
             </div>
             <h3 className="text-xl font-bold text-gray-800 mb-2">飲みすぎた</h3>
             <p className="text-sm text-gray-500 text-center mb-6 flex-grow">今のうちにできる<br/>即効ケアを提案</p>
@@ -57,9 +74,10 @@ const Home = () => {
               診断へ進む <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
             </div>
           </Link>
+
           <Link to="/diagnosis?timing=2" className="group flex flex-col items-center bg-white/95 backdrop-blur-sm p-8 rounded-3xl shadow-xl shadow-orange-200/50 border-2 border-transparent hover:border-orange-400 transition-all duration-300 hover:-translate-y-1 no-underline">
-            <div className="bg-gradient-to-br from-orange-100 to-orange-50 text-primary w-16 h-16 rounded-2xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 shadow-inner">
-              <Coffee className="w-8 h-8" />
+            <div className="w-24 h-24 mb-2 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+              <img src={MorningImg} alt="翌朝がつらい" className="w-full h-full object-contain drop-shadow-sm" />
             </div>
             <h3 className="text-xl font-bold text-gray-800 mb-2">翌朝がつらい</h3>
             <p className="text-sm text-gray-500 text-center mb-6 flex-grow">二日酔いの症状を<br/>ピンポイントで緩和</p>
@@ -70,15 +88,15 @@ const Home = () => {
         </div>
       </section>
 
+      {/* 3. シミュレーター */}
       <section className="max-w-5xl mx-auto px-6 mb-20 w-full relative z-20">
         <Link to="/simulation" className="group block bg-gradient-to-r from-gray-800 to-gray-900 rounded-3xl p-1 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 no-underline">
           <div className="bg-gray-900 rounded-[1.4rem] px-6 py-8 md:px-10 flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden relative">
-            {/* 背景の装飾光 */}
             <div className="absolute right-0 top-0 w-64 h-64 bg-primary/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
             
             <div className="flex items-center gap-5 md:gap-6 relative z-10 w-full md:w-auto">
-              <div className="bg-gradient-to-br from-orange-400 to-primary w-14 h-14 md:w-16 md:h-16 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-110 transition-transform duration-300">
-                <Calculator className="w-7 h-7 md:w-8 md:h-8 text-white" />
+              <div className="w-20 h-20 md:w-24 md:h-24 flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
+                 <img src={CalcImg} alt="計算機" className="w-full h-full object-contain drop-shadow-lg" />
               </div>
               <div className="flex-grow">
                 <h3 className="text-lg md:text-2xl font-bold text-white mb-1.5 flex items-center gap-2">
@@ -100,10 +118,8 @@ const Home = () => {
         </Link>
       </section>
 
-      {/* 3. 使い方は簡単３ステップ */}
-      {/* 【変更点】全幅で明るいグラデーションを敷き、装飾の光（blur）を追加 */}
+      {/* 4. 使い方は簡単３ステップ */}
       <section className="py-20 px-6 w-full bg-gradient-to-b from-orange-50 via-amber-100/60 to-orange-50 relative overflow-hidden">
-        {/* 背景のうっすらとした円形アクセント */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/60 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-orange-200/40 rounded-full blur-3xl translate-y-1/2 -translate-x-1/3"></div>
 
@@ -118,8 +134,8 @@ const Home = () => {
                 <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-orange-500 to-primary text-white w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl border-4 border-white shadow-md">
                   {steps[activeStep].id}
                 </div>
-                <div className="mt-4 mb-5 bg-white w-20 h-20 rounded-2xl flex items-center justify-center mx-auto shadow-sm text-primary">
-                  {steps[activeStep].icon}
+                <div className="mt-2 mb-4 w-28 h-28 flex items-center justify-center mx-auto transition-transform duration-300">
+                  <img src={steps[activeStep].image} alt={steps[activeStep].title} className="w-full h-full object-contain drop-shadow-sm" />
                 </div>
                 <h3 className="font-bold text-xl mb-3 text-gray-800">{steps[activeStep].title}</h3>
                 <p className="text-sm text-gray-600 leading-relaxed">{steps[activeStep].desc}</p>
@@ -134,30 +150,30 @@ const Home = () => {
         </div>
       </section>
 
-      {/* 4. 特徴セクション */}
+      {/* 5. 特徴セクション */}
       <section className="py-16 px-6 bg-orange-50/30 border-t border-orange-100/50 w-full">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-800">Nomu-Supの特徴</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center p-8 bg-white rounded-3xl shadow-sm border border-orange-50 hover:shadow-md transition-shadow">
-              <div className="bg-orange-100 w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-5">
-                <ShieldCheck className="text-primary w-7 h-7" />
+            <div className="text-center p-8 bg-white rounded-3xl shadow-sm border border-orange-50 hover:shadow-md transition-shadow group">
+              <div className="w-20 h-20 mx-auto mb-5 transition-transform duration-300 group-hover:scale-110">
+                <img src={Feature1Img} alt="薬剤師監修" className="w-full h-full object-contain drop-shadow-sm" />
               </div>
               <h3 className="font-bold text-lg mb-3 text-gray-800">薬剤師監修</h3>
               <p className="text-sm text-gray-500 leading-relaxed">あなたの体質や症状に合わせ、医学的視点から最適な薬や成分を提案。</p>
             </div>
-            <div className="text-center p-8 bg-white rounded-3xl shadow-sm border border-orange-50 hover:shadow-md transition-shadow">
-              <div className="bg-orange-100 w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-5">
-                <Zap className="text-primary w-7 h-7" />
+            <div className="text-center p-8 bg-white rounded-3xl shadow-sm border border-orange-50 hover:shadow-md transition-shadow group">
+              <div className="w-20 h-20 mx-auto mb-5 transition-transform duration-300 group-hover:scale-110">
+                <img src={Feature2Img} alt="直感的な診断" className="w-full h-full object-contain drop-shadow-sm" />
               </div>
               <h3 className="font-bold text-lg mb-3 text-gray-800">直感的な診断</h3>
               <p className="text-sm text-gray-500 leading-relaxed">「飲む前・中・後」を選ぶだけ。たった数問で今のあなたに最適なケアが判明。</p>
             </div>
-            <div className="text-center p-8 bg-white rounded-3xl shadow-sm border border-orange-50 hover:shadow-md transition-shadow">
-              <div className="bg-orange-100 w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-5">
-                <History className="text-primary w-7 h-7" />
+            <div className="text-center p-8 bg-white rounded-3xl shadow-sm border border-orange-50 hover:shadow-md transition-shadow group">
+              <div className="w-20 h-20 mx-auto mb-5 transition-transform duration-300 group-hover:scale-110">
+                <img src={Feature3Img} alt="履歴を保存" className="w-full h-full object-contain drop-shadow-sm" />
               </div>
               <h3 className="font-bold text-lg mb-3 text-gray-800">履歴を保存</h3>
               <p className="text-sm text-gray-500 leading-relaxed">ログインすれば過去の診断履歴を保存。自分に合う対策がいつでも見返せる。</p>
