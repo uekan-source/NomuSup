@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import client from '../api/client';
 import { useAuth } from '../context/AuthContext';
-import { User, Mail, Save, Scale, Activity } from 'lucide-react';
+import { User, Mail, Save, Scale, Activity, ChevronLeft } from 'lucide-react';
 
 const UserEdit = () => {
   const { user, login } = useAuth(); 
@@ -51,6 +51,10 @@ const UserEdit = () => {
 
   return (
     <div className="max-w-md mx-auto py-10 px-6 animate-fadeIn pb-32">
+      <button onClick={() => navigate('/mypage')} className="flex items-center text-gray-500 mb-6 hover:text-primary transition-colors">
+        <ChevronLeft className="w-5 h-5" />
+        <span>マイページに戻る</span>
+      </button>
       <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">プロフィール編集</h2>
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* 基本情報 */}
