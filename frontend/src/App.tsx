@@ -1,4 +1,6 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
+import ReactGA from 'react-ga4';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import Home from './pages/Home'; 
@@ -22,6 +24,7 @@ const App = () => {
   return (
     <AuthProvider>
       <BrowserRouter>
+        <AnalyticsTracker />
         <div className="flex flex-col min-h-screen bg-white text-gray-900">
           <Header />
           <main className="flex-grow">
@@ -52,4 +55,28 @@ const App = () => {
   );
 };
 
+const AnalyticsTracker = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    // Viteの本番モード判定
+    if (import.meta.env.PROD) { 
+      ReactGA.initialize("G-M0C6M339YH");
+    }
+  }, []);
+
+  useEffect(() => {
+    if (import.meta.env.PROD) {
+      ReactGA.send({ 
+        hitType: "pageview", 
+        page: location.pathname + location.search 
+      });
+    } else {
+      // ローカル開発中（npm run dev）は計測せずコンソール出力のみ
+      console.log("GA4 PV Tracker (Dev-mode):", location.pathname);
+    }
+  }, [location]);
+
+  return null;
+};
 export default App;
