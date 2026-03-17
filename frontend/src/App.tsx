@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import ScrollToTop from './components/ScrollToTop';
 import { useEffect } from 'react';
 import ReactGA from 'react-ga4';
 import Header from './components/layout/Header';
@@ -24,6 +25,7 @@ const App = () => {
   return (
     <AuthProvider>
       <BrowserRouter>
+        <ScrollToTop /> {/* 💡 ここに追加しました！ */}
         <AnalyticsTracker />
         <div className="flex flex-col min-h-screen bg-white text-gray-900">
           <Header />
