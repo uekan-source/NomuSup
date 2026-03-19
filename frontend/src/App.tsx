@@ -25,7 +25,7 @@ const App = () => {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <ScrollToTop /> {/* 💡 ここに追加しました！ */}
+        <ScrollToTop /> 
         <AnalyticsTracker />
         <div className="flex flex-col min-h-screen bg-white text-gray-900">
           <Header />

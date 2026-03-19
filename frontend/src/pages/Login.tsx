@@ -10,7 +10,7 @@ const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  // ▼▼▼ 修正ポイント①：環境に合わせてURLを自動で切り替える変数を準備 ▼▼▼
+  // 環境に合わせてURLを自動で切り替える変数を準備 
   const isProduction = import.meta.env.PROD;
   
   // GoogleとGitHub用 (ローカルは localhost)
@@ -22,7 +22,6 @@ const Login = () => {
   const backendBaseUrlForX = isProduction 
     ? 'https://api.nomu-sup.com' 
     : 'http://127.0.0.1:3000';
-  // ▲▲▲ ここまで ▲▲▲
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,7 +48,6 @@ const Login = () => {
 
   return (
     <div className="max-w-md mx-auto py-16 px-6">
-      {/* --- ヘッダー・フォーム部分は変更なしなので省略せずにそのまま --- */}
       <div className="text-center mb-10">
         <div className="inline-block bg-orange-100 p-4 rounded-full mb-4 text-primary">
           <LogIn className="w-8 h-8" />
@@ -99,7 +97,6 @@ const Login = () => {
         </div>
 
         <div className="mt-6">
-          {/* ▼▼▼ 修正ポイント②：Googleのhrefに変数を使う ▼▼▼ */}
           <a
             href={`${backendBaseUrl}/api/v1/users/auth/google_oauth2`}
             className="w-full flex items-center justify-center py-4 px-4 border border-gray-300 rounded-full shadow-sm bg-white text-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors"
@@ -111,7 +108,6 @@ const Login = () => {
       </div>
 
       <div className="mt-3">
-        {/* ▼▼▼ 修正ポイント③：GitHubのhrefに変数を使う ▼▼▼ */}
         <a
           href={`${backendBaseUrl}/api/v1/users/auth/github`}
           className="w-full flex items-center justify-center py-4 px-4 border border-gray-300 rounded-full shadow-sm bg-[#24292F] text-sm font-bold text-white hover:bg-gray-800 transition-colors"
@@ -124,7 +120,6 @@ const Login = () => {
       </div>
 
       <div className="mt-3">
-        {/* ▼▼▼ 修正ポイント④：Xのhrefに変数を使う ▼▼▼ */}
         <a
           href={`${backendBaseUrlForX}/api/v1/users/auth/twitter`}
           className="w-full flex items-center justify-center py-4 px-4 border border-gray-300 rounded-full shadow-sm bg-black text-sm font-bold text-white hover:bg-gray-800 transition-colors"

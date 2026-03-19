@@ -10,8 +10,7 @@
 # Many of these configuration options can be set straight in your model.
 Devise.setup do |config|
   config.jwt do |jwt|
-    jwt.secret = '987ba70954a4ef34eff93e1318e3008619de5baed83a2b2cb9344c0292bac05290a79f55276b66b54dd3a72f58b8eef546b1799665363e0e48dcc80a4638a33c'
-    
+    jwt.secret = ENV.fetch('DEVISE_JWT_SECRET', '987ba70954a4ef34eff93e1318e3008619de5baed83a2b2cb9344c0292bac05290a79f55276b66b54dd3a72f58b8eef546b1799665363e0e48dcc80a4638a33c')
     # ログイン・ログアウトのURLパターン
     jwt.dispatch_requests = [
       ['POST', %r{^/api/v1/auth/login$}]

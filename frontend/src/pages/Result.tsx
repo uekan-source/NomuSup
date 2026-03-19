@@ -8,8 +8,6 @@ import {
   MapPin, ExternalLink, ChevronDown, ChevronUp, Droplet
 } from 'lucide-react';
 import DiagnosisHeader from '../components/shared/DiagnosisHeader';
-
-// 💡 1. 作成した2つの画像をインポート
 import PrescriptionImg from '../assets/images/prescription_result.png';
 import PharmacistImg from '../assets/images/pharmacist_advice.png';
 
@@ -161,7 +159,6 @@ const Result = () => {
 
       {/* 2. Title */}
       <div className="text-center mb-12 relative z-10 animate-fadeSlideInUp" style={{ animationDelay: `${DELAY_STEP * 1}ms` }}>
-        {/* 💡 処方箋イラストに変更！背景の丸い色を消して、画像を少し大きく配置 */}
         <div className="w-28 h-28 mx-auto mb-2 animate-bounce-subtle">
           <img src={PrescriptionImg} alt="あなたの処方箋" className="w-full h-full object-contain drop-shadow-md" />
         </div>
@@ -182,8 +179,6 @@ const Result = () => {
           
           <div className="animate-fadeSlideInUp" style={{ animationDelay: `${DELAY_STEP * 2}ms` }}>
             <div className="flex gap-4 items-start">
-              
-              {/* 💡 薬剤師イラストに変更！ */}
               <div className="flex flex-col items-center gap-1 flex-shrink-0">
                 <div className="w-16 h-16 flex items-center justify-center">
                   <img src={PharmacistImg} alt="薬剤師" className="w-full h-full object-contain drop-shadow-sm" />

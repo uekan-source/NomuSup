@@ -313,13 +313,8 @@ const Simulation = () => {
         )}
       </div>
 
-      {/* ==============================================================
-          💡 ここからが新機能：画面下部に固定される「カート風フローティングバー」
-      ============================================================== */}
       <div className="fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-md border-t border-gray-200 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.15)] z-50">
         <div className="max-w-2xl mx-auto px-6 py-4">
-          
-          {/* 追加したお酒を横スクロールで表示 */}
           {drinks.length > 0 ? (
             <div className="flex gap-3 overflow-x-auto pb-3 mb-1 hide-scrollbar snap-x">
               {drinks.map((drink) => (

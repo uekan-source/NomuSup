@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 
 // ==========================================
-// 💡 イラストをインポート（※削除された項目の画像は除外済）
+// 💡 イラストをインポート
 // ==========================================
 // 1. 予定 (timing=0)
 import PlanHeavyDrinkingImg from '../assets/images/plan_heavy_drinking.png';
@@ -71,7 +71,6 @@ const Diagnosis = () => {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // 💡 どのタイミングでも体質(Step3)が存在するようになったため、maxStepは常に3
   const maxStep = 3;
   const [wizardStep, setWizardStep] = useState<number>(1);
 
@@ -127,7 +126,6 @@ const Diagnosis = () => {
         title1: '今の気分は？', title2: '具体的な症状は？', title3: 'あなたの体質は？'
       };
     } else {
-      // 💡 翌朝(timing=2)にも体質のステップとヘッダーを追加
       return {
         header: [{ id: 1, label: '気分' }, { id: 2, label: '症状' }, { id: 3, label: '体質' }, { id: 4, label: '結果' }],
         step1: moods,

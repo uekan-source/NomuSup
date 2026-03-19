@@ -1,6 +1,6 @@
 # Nomu-Sup（ノムサプ）｜ 薬剤師監修・二日酔い対策ソムリエ
 
-[![URL](https://img.shields.io/badge/URL-アプリはこちら-orange?style=for-the-badge)]https://www.nomu-sup.com/
+https://www.nomu-sup.com/
 
 ## サービス概要
 「飲み会前」「飲酒中」「翌朝」の3つのタイミングに合わせて、**薬学的根拠に基づいた「今、コンビニや薬局で買うべき対策セット」を提案**するWebアプリです。

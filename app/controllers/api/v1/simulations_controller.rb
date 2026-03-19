@@ -1,8 +1,6 @@
 module Api
   module V1
     class SimulationsController < ApplicationController
-      # 誰でも（非ログインでも）使えるようにするため、認証の before_action はかけません
-
       def calculate
         weight = params[:weight].to_f
         gender = params[:gender].presence || 'male'
