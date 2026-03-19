@@ -11,11 +11,10 @@ import {
 } from 'lucide-react';
 
 // ==========================================
-// 💡 全30枚のイラストをインポート
+// 💡 イラストをインポート（※削除された項目の画像は除外済）
 // ==========================================
 // 1. 予定 (timing=0)
 import PlanHeavyDrinkingImg from '../assets/images/plan_heavy_drinking.png';
-import PlanCarbonatedImg from '../assets/images/plan_carbonated.png';
 import PlanMixingDrinksImg from '../assets/images/plan_mixing_drinks.png';
 import PlanOilyFoodImg from '../assets/images/plan_oily_food.png';
 import PlanImportantEventImg from '../assets/images/plan_important_event.png';
@@ -25,17 +24,14 @@ import CondYesterdayHangoverImg from '../assets/images/cond_yesterday_hangover.p
 import CondHungryImg from '../assets/images/cond_hungry.png';
 import CondStomachIssueImg from '../assets/images/cond_stomach_issue.png';
 import CondDehydratedImg from '../assets/images/cond_dehydrated.png';
-import CondMouthSkinImg from '../assets/images/cond_mouth_skin.png';
 
-// 3. 体質 (timing=0, 1)
+// 3. 体質 (timing=0, 1, 2)
 import CondFlushImg from '../assets/images/cond_flush.png';
 import CondHangoverImg from '../assets/images/cond_hangover.png';
 import CondStomachImg from '../assets/images/cond_stomach.png';
 import CondEdemaImg from '../assets/images/cond_edema.png';
-import CondHeadacheImg from '../assets/images/cond_headache.png';
 
 // 4. 飲みすぎた: 気分 (timing=1)
-import MoodRamenImg from '../assets/images/mood_ramen.png';
 import MoodRefreshImg from '../assets/images/mood_refresh.png';
 import MoodTipsyImg from '../assets/images/mood_tipsy.png';
 import MoodThirstyImg from '../assets/images/mood_thirsty.png';
@@ -45,7 +41,6 @@ import MoodTiredImg from '../assets/images/mood_tired.png';
 import CondNauseaImg from '../assets/images/cond_nausea.png';
 import CondDizzinessImg from '../assets/images/cond_dizziness.png';
 import CondThirstImg from '../assets/images/cond_thirst.png';
-import CondStomachAcheImg from '../assets/images/cond_stomach_ache.png';
 import CondFeverImg from '../assets/images/cond_fever.png';
 
 // 6. 翌朝: 気分 (timing=2)
@@ -76,7 +71,8 @@ const Diagnosis = () => {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const maxStep = isHangoverMode ? 2 : 3;
+  // 💡 どのタイミングでも体質(Step3)が存在するようになったため、maxStepは常に3
+  const maxStep = 3;
   const [wizardStep, setWizardStep] = useState<number>(1);
 
   useEffect(() => {
@@ -131,12 +127,13 @@ const Diagnosis = () => {
         title1: '今の気分は？', title2: '具体的な症状は？', title3: 'あなたの体質は？'
       };
     } else {
+      // 💡 翌朝(timing=2)にも体質のステップとヘッダーを追加
       return {
-        header: [{ id: 1, label: '気分' }, { id: 2, label: '症状' }, { id: 3, label: '結果' }],
+        header: [{ id: 1, label: '気分' }, { id: 2, label: '症状' }, { id: 3, label: '体質' }, { id: 4, label: '結果' }],
         step1: moods,
         step2: symptoms,
-        step3: [],
-        title1: '今の気分は？', title2: '具体的な症状は？', title3: ''
+        step3: constitutions,
+        title1: '今の気分は？', title2: '具体的な症状は？', title3: 'あなたの体質は？'
       };
     }
   };
@@ -151,7 +148,6 @@ const Diagnosis = () => {
   const getImageForText = (text: string) => {
     // --- 1. 予定 ---
     if (text.includes('深酒')) return PlanHeavyDrinkingImg;
-    if (text.includes('炭酸')) return PlanCarbonatedImg;
     if (text.includes('チャンポン') || text.includes('種類')) return PlanMixingDrinksImg;
     if (text.includes('脂っこい')) return PlanOilyFoodImg;
     if (text.includes('外せない')) return PlanImportantEventImg;
@@ -161,17 +157,14 @@ const Diagnosis = () => {
     if (text.includes('空腹')) return CondHungryImg;
     if (text.includes('胃の調子')) return CondStomachIssueImg;
     if (text.includes('渇いている・脱水')) return CondDehydratedImg;
-    if (text.includes('口内炎')) return CondMouthSkinImg;
 
     // --- 3. 体質 ---
     if (text.includes('赤くなる体質')) return CondFlushImg;
     if (text.includes('残りやすくなった体質')) return CondHangoverImg;
-    if (text.includes('もたれやすい体質')) return CondStomachImg;
+    if (text.includes('もたれやすい体質')) return CondStomachImg; // 翌朝にも適用されます
     if (text.includes('むくむ体質')) return CondEdemaImg;
-    if (text.includes('頭痛が起きる体質')) return CondHeadacheImg;
 
     // --- 4. 飲みすぎた: 気分 ---
-    if (text.includes('締めを食べたい')) return MoodRamenImg;
     if (text.includes('ガブ飲み')) return MoodRefreshImg;
     if (text.includes('フワフワ')) return MoodTipsyImg;
     if (text.includes('飲み足りない')) return MoodThirstyImg;
@@ -181,11 +174,10 @@ const Diagnosis = () => {
     if (text.includes('ムカムカする吐き気')) return CondNauseaImg;
     if (text.includes('足元がふらつく')) return CondDizzinessImg;
     if (text.includes('異常に喉が渇く')) return CondThirstImg;
-    if (text.includes('胃がキリキリ')) return CondStomachAcheImg;
     if (text.includes('異常に熱い')) return CondFeverImg;
 
     // --- 6. 翌朝: 気分 ---
-    if (text.includes('起き上がれない')) return MoodHangoverHeavyBodyImg;
+    if (text.includes('温かい')) return MoodHangoverHeavyBodyImg;
     if (text.includes('とにかく水分が欲しい')) return MoodHangoverThirstImg;
     if (text.includes('何も食べたくない')) return MoodHangoverNoAppetiteImg;
     if (text.includes('記憶が曖昧')) return MoodHangoverRegretImg;
@@ -198,7 +190,7 @@ const Diagnosis = () => {
     if (text.includes('むくみがひどい')) return CondHangoverEdemaImg;
     if (text.includes('下痢')) return CondHangoverDiarrheaImg;
 
-    return null; // 画像がない場合はnull
+    return null; 
   };
 
   // 万が一画像がない場合のフォールバックアイコン
@@ -208,18 +200,18 @@ const Diagnosis = () => {
     
     if (text.includes('空腹')) return <Utensils className={iconClass} />;
     if (text.includes('予定')) return <Calendar className={iconClass} />;
-    if (text.includes('炭酸') || text.includes('お酒')) return <Beer className={iconClass} />;
+    if (text.includes('お酒')) return <Beer className={iconClass} />;
     if (text.includes('弱い')) return <Activity className={iconClass} />;
     if (text.includes('赤く') || text.includes('熱い')) return <ThermometerSun className={iconClass} />;
     if (text.includes('ふらつく')) return <Wind className={iconClass} />;
     if (text.includes('渇く') || text.includes('水分')) return <Droplets className={iconClass} />;
-    if (text.includes('締め') || text.includes('食事')) return <Soup className={iconClass} />;
+    if (text.includes('食事')) return <Soup className={iconClass} />;
     if (text.includes('違和感') || text.includes('残って')) return <AlertTriangle className={iconClass} />;
     if (text.includes('頭痛')) return <Brain className={iconClass} />;
     if (text.includes('吐き気') || text.includes('気分') || text.includes('後悔')) return <Frown className={iconClass} />;
     if (text.includes('だるい') || text.includes('重い')) return <BatteryWarning className={iconClass} />;
     if (text.includes('むくみ')) return <CloudRain className={iconClass} />;
-    if (text.includes('胃痛') || text.includes('もたれ') || text.includes('下痢')) return <HeartPulse className={iconClass} />;
+    if (text.includes('もたれ') || text.includes('下痢')) return <HeartPulse className={iconClass} />;
     return isHangoverMode ? <Droplet className={iconClass} /> : <Sparkles className={iconClass} />;
   };
 
