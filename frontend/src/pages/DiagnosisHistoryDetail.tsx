@@ -6,7 +6,6 @@ import {
   Lightbulb, MapPin, ShoppingCart, ExternalLink 
 } from 'lucide-react';
 
-// 💡 薬剤師のイラストをインポート
 import PharmacistImg from '../assets/images/pharmacist_advice.png';
 
 const DiagnosisHistoryDetail = () => {
@@ -78,7 +77,6 @@ const DiagnosisHistoryDetail = () => {
         <div className="p-6 space-y-8">
           
           {/* 古いデータ（カラム追加前の診断履歴）でエラーにならないよう、log.result_summary がある時だけ表示 */}
-          {/* 💡 診断結果画面と同じチャット風のデザインに変更！ */}
           {log.result_summary && (
             <section>
               <div className="flex gap-4 items-start">
@@ -174,7 +172,6 @@ const DiagnosisHistoryDetail = () => {
                       </div>
                     )}
 
-                    {/* ▼ 追加：診断結果画面と同じアクションボタン ▼ */}
                     <div className="flex flex-col gap-3 mt-2 border-t border-gray-100 pt-4">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <a 

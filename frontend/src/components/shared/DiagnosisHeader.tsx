@@ -4,14 +4,14 @@ import { ChevronLeft } from 'lucide-react';
 interface DiagnosisHeaderProps {
   currentStep: number;
   steps: { id: number; label: string }[];
-  // 💡 【追加】テーマカラーを外から受け取れるようにする（デフォルトはオレンジ）
+  // テーマカラーを外から受け取れるようにする（デフォルトはオレンジ）
   theme?: 'orange' | 'blue'; 
 }
 
 const DiagnosisHeader = ({ currentStep, steps, theme = 'orange' }: DiagnosisHeaderProps) => {
   const navigate = useNavigate();
 
-  // 💡 テーマに応じたカラークラスを定義
+  //  テーマに応じたカラークラスを定義
   const isBlue = theme === 'blue';
   const bgLineColor = isBlue ? 'bg-blue-100' : 'bg-orange-100';
   const activeLineColor = isBlue ? 'bg-gradient-to-r from-blue-300 to-cyan-500' : 'bg-gradient-to-r from-orange-400 to-primary';

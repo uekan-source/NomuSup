@@ -87,7 +87,7 @@ const UserEdit = () => {
           </div>
         </div>
 
-        {/* 💡 追加: シミュレーション用データ */}
+        {/*  シミュレーション用データ */}
         <div className="bg-orange-50/50 p-6 rounded-3xl shadow-sm border border-orange-100 space-y-5">
           <h3 className="text-sm font-bold text-primary flex items-center gap-2 mb-4">
             <Activity className="w-4 h-4" />

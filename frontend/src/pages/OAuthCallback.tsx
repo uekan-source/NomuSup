@@ -3,7 +3,6 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const OAuthCallback = () => {
   const navigate = useNavigate();
-  // URLの「?token=xxx」の部分を取得するための便利なフック
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
@@ -13,8 +12,6 @@ const OAuthCallback = () => {
     if (token) {
       // 2. トークンが存在すれば、ブラウザに保存する（通常のログインと同じ処理）
       localStorage.setItem('token', token);
-      
-      // （※もしAuthContextなどでログイン状態を管理している場合は、ここで状態を更新する関数を呼び出します）
 
       // 3. ログイン完了として、トップページ（またはマイページ）へ強制移動させる
       navigate('/', { replace: true });

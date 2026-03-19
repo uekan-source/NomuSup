@@ -1,7 +1,6 @@
 module Api
   module V1
     class DiagnosisLogsController < ApplicationController
-      # 【修正】自作の認証メソッドを使用するように変更
       before_action :ensure_logged_in, only: %i[index show create destroy]
 
       def index
@@ -86,7 +85,7 @@ module Api
 
       private
 
-      # 【追加】ログインしていない場合に401を返すメソッド
+      # ログインしていない場合に401を返すメソッド
       def ensure_logged_in
         return unless current_user.nil?
 

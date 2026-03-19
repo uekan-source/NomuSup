@@ -21,15 +21,13 @@ module Api
           # Googleから送られてきたユーザー情報
           auth = request.env['omniauth.auth']
 
-          # 先ほどUserモデルに書いたメソッドでユーザーを検索・作成
           user = User.from_omniauth(auth)
 
           frontend_url = ENV['FRONTEND_URL'].presence || 'http://localhost:5173'
 
           if user.persisted?
-            # ログイン成功：JWTトークンを発行（既存のログインと同じ処理）
             token, _payload = Warden::JWTAuth::UserEncoder.new.call(user, :user, nil)
-            # 【重要】React側の特定のURLへ、トークンをくっつけてリダイレクト！
+            # React側の特定のURLへ、トークンをくっつけてリダイレクト
             redirect_to "#{frontend_url}/oauth/callback?token=#{token}", allow_other_host: true
           else
             # 失敗した場合：Reactのログイン画面にエラーパラメータをつけてリダイレクト

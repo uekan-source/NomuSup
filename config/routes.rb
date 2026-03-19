@@ -1,8 +1,4 @@
 Rails.application.routes.draw do
-  get '/magic_seed', to: proc { 
-    Rails.application.load_seed
-    [200, { 'Content-Type' => 'text/plain; charset=utf-8' }, ['シードデータの投入が完了しました！']]
-  }
   namespace :api do
     namespace :v1 do
       get 'health_check', to: 'health_check#index'
@@ -14,13 +10,12 @@ Rails.application.routes.draw do
         end
       end
 
-      # ▼ 新規追加：アルコール分解シミュレーション用
+      # アルコール分解シミュレーション用
       resources :simulations, only: [] do
         collection do
           post :calculate
         end
       end
-      # ▲ ここまで
 
       get 'me', to: 'users#show'
       patch 'me', to: 'users#update'

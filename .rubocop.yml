@@ -13,7 +13,7 @@ AllCops:
     - "node_modules/**/*"
     - "Gemfile"
 
-# クラスやモジュールにコメントを必須にしない（ポートフォリオでは不要なため）
+# クラスやモジュールにコメントを必須にしない
 Style/Documentation:
   Enabled: false
 
@@ -33,7 +33,7 @@ Metrics/MethodLength:
 Metrics/BlockLength:
   Exclude:
     - "config/routes.rb"
-    - "spec/**/*" # 後でRSpecを入れた時のため
+    - "spec/**/*" 
 Rails/Exit:
   Exclude:
     - 'spec/rails_helper.rb'
